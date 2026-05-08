@@ -523,34 +523,45 @@
     background: var(--bg-elev);
     padding: 14px 16px;
   }
-  .exercise-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 4px;
-  }
   .exercise-name {
     font-size: 15px;
     font-weight: 600;
   }
-  .exercise-current {
-    font-family: var(--mono);
-    font-size: 14px;
-    font-variant-numeric: tabular-nums;
-    color: var(--text);
+
+  /* Two-column body: info on the left, chart on the right.
+     Stacked on narrow viewports where the chart would lose readability. */
+  .exercise-body {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    align-items: stretch;
   }
-  .exercise-current.dim { color: var(--text-faint); }
-  .exercise-meta {
-    font-size: 12px;
-    color: var(--text-faint);
-    text-transform: capitalize;
-    margin-bottom: 8px;
+  @media (min-width: 520px) {
+    .exercise-body {
+      grid-template-columns: 1fr minmax(180px, 280px);
+      gap: 16px;
+    }
   }
+  .exercise-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .exercise-chart-wrap {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+  }
+  /* Push the "Last" line to the bottom of the info column on wide layouts. */
+  .exercise-info .exercise-last {
+    margin-top: auto;
+  }
+
   .muscle-chips {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
-    margin-bottom: 8px;
   }
   .muscle-chips .chip {
     background: var(--bg-elev-2);
@@ -564,13 +575,31 @@
     font-size: 12px;
     color: var(--text-dim);
     font-style: italic;
-    margin-bottom: 8px;
+  }
+  .exercise-last {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding-top: 4px;
+  }
+  .exercise-last .lbl {
+    font-size: 11px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .exercise-last .val {
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    letter-spacing: -0.01em;
   }
   .exercise-chart {
     width: 100% !important;
-    height: 90px !important;
+    height: 110px !important;
     display: block;
-    margin: 8px 0;
   }
   .exercise-link {
     display: inline-block;
@@ -587,171 +616,193 @@
   }
 
   /* ---- Body & Mind tab ---- */
-  .bodymind-layout {
-    position: relative;
-  }
-  .bodymind-main { min-width: 0; }
 
-  /* Chip row TOC — used on mobile, hidden on wide */
-  .bodymind-toc-chips {
-    display: flex;
-    gap: 4px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
+  /* Hub */
+  .bm-hub-intro {
+    margin-bottom: 28px;
+    padding-bottom: 18px;
     border-bottom: 1px solid var(--border);
   }
-  .bodymind-toc-chips::-webkit-scrollbar { display: none; }
-  .bm-chip {
-    flex: 0 0 auto;
-    font-size: 12px;
+  .bm-hub-title {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .bm-hub-sub {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .bm-section + .bm-section { margin-top: 32px; }
+  .bm-section-head {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--text-faint);
-    padding: 5px 10px;
+    margin: 0 0 14px;
+  }
+  .bm-cat-head {
+    font-size: 11px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 18px 0 8px;
+  }
+  .bm-section-head + .bm-card-grid { margin-top: 0; }
+
+  .bm-card-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .bm-card {
+    display: block;
+    padding: 10px 14px;
     border: 1px solid var(--border);
-    border-radius: 999px;
+    border-radius: var(--radius);
+    background: var(--bg-elev);
     text-decoration: none;
+    color: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    /* One-line, ellipsis if it overflows */
     white-space: nowrap;
-    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: border-color 0.15s, background 0.15s;
   }
-  .bm-chip:hover { color: var(--text-dim); border-color: var(--border-strong); }
-  .bm-chip.active {
-    color: var(--accent);
-    border-color: var(--accent);
-    background: var(--accent-dim);
-  }
-
-  /* Sidebar TOC — only on wide viewports. position:fixed so it doesn't shift the
-     main column. Hidden below 1140px (where there's no room beside the 720px
-     centered column). */
-  .bodymind-toc-sidebar { display: none; }
-
-  @media (min-width: 1140px) {
-    .bodymind-toc-chips { display: none; }
-    .bodymind-toc-sidebar {
-      display: block;
-      position: fixed;
-      top: 110px;
-      /* Match where the 720-wide main column ends, plus a 32px gap. */
-      left: calc(50% + 360px + 32px);
-      width: 220px;
-      max-height: calc(100vh - 140px);
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-    .bodymind-toc-head {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-faint);
-      margin-bottom: 10px;
-    }
-    .bodymind-toc-sidebar ol {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      border-left: 1px solid var(--border);
-    }
-    .bodymind-toc-sidebar li { padding: 0; }
-    .bodymind-toc-sidebar a {
-      display: block;
-      padding: 4px 12px;
-      margin-left: -1px;
-      font-size: 13px;
-      color: var(--text-faint);
-      text-decoration: none;
-      border-left: 1px solid transparent;
-      transition: color 0.15s, border-color 0.15s;
-    }
-    .bodymind-toc-sidebar a:hover { color: var(--text-dim); }
-    .bodymind-toc-sidebar a.active {
-      color: var(--accent);
-      border-left-color: var(--accent);
-    }
-  }
-
-  /* Prose container — readable long-form typography */
-  .prose {
+  .bm-card:hover { border-color: var(--border-strong); background: var(--bg-elev-2); }
+  .bm-card-name {
+    font-weight: 600;
     color: var(--text);
-    font-size: 15px;
-    line-height: 1.65;
   }
-  .prose > *:first-child { margin-top: 0; }
-  .prose h1 {
+  .bm-card-blurb {
+    color: var(--text-dim);
+  }
+  /* A subtle accent border on principles to flag them as different */
+  .bm-card-principle { border-left: 2px solid var(--accent); }
+
+  /* Detail */
+  .bm-back {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-decoration: none;
+    margin-bottom: 16px;
+    transition: color 0.15s;
+  }
+  .bm-back:hover { color: var(--text); }
+  .bm-detail-kind {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 6px;
+  }
+  .bm-detail-kind .sep { color: var(--text-faint); }
+  .bm-detail-title {
     font-size: 24px;
     font-weight: 600;
     letter-spacing: -0.01em;
-    margin: 0 0 24px;
-  }
-  .prose h2 {
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: -0.005em;
-    margin: 40px 0 12px;
-    padding-top: 4px;
-    /* Reset h2 styling we set globally for section headings — body & mind
-       wants real headings, not all-caps eyebrows. */
+    margin: 0 0 6px;
     text-transform: none;
     color: var(--text);
-    scroll-margin-top: 80px;
   }
-  .prose h3 {
-    font-size: 15px;
-    font-weight: 600;
-    margin: 24px 0 8px;
-    color: var(--text);
-    scroll-margin-top: 80px;
-  }
-  .prose p {
-    margin: 12px 0;
-    color: var(--text-dim);
-  }
-  .prose strong { color: var(--text); font-weight: 600; }
-  .prose em { color: var(--text); font-style: italic; }
-  .prose ul, .prose ol {
-    margin: 12px 0;
-    padding-left: 22px;
-    color: var(--text-dim);
-  }
-  .prose li {
-    margin: 4px 0;
-  }
-  .prose li::marker { color: var(--text-faint); }
-  .prose code {
+  .bm-detail-dose {
     font-family: var(--mono);
     font-size: 13px;
-    background: var(--bg-elev);
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 10px;
+  }
+  .bm-detail-blurb {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--text-dim);
+    margin: 0 0 24px;
+  }
+
+  .bm-detail-body { margin-top: 8px; }
+  .bm-block-head {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 22px 0 8px;
+  }
+  .bm-list {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.55;
+  }
+  .bm-list li { margin: 4px 0; }
+  .bm-list li::marker { color: var(--text-faint); }
+  .bm-list.tone-good li::marker  { color: var(--good); }
+  .bm-list.tone-bad  li::marker  { color: var(--bad); }
+  .bm-para {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.55;
+  }
+
+  /* Relations panels */
+  .bm-rels { margin-top: 28px; }
+  .bm-rel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .bm-rel {
+    display: block;
+    padding: 10px 12px;
     border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 1px 5px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-elev);
+    text-decoration: none;
+    color: inherit;
+    font-size: 14px;
+    line-height: 1.4;
+    /* One line; ellipsis on overflow. */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .bm-rel:hover { border-color: var(--border-strong); background: var(--bg-elev-2); }
+  .bm-rel-verb {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-right: 8px;
+  }
+  .bm-rel.tone-good .bm-rel-verb { color: var(--good); }
+  .bm-rel.tone-bad  .bm-rel-verb { color: var(--bad); }
+  .bm-rel-name {
+    font-weight: 600;
     color: var(--text);
   }
-  .prose blockquote {
-    margin: 16px 0;
-    padding: 8px 14px;
-    border-left: 2px solid var(--accent);
-    background: var(--bg-elev);
+  .bm-rel-desc {
     color: var(--text-dim);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   }
-  .prose hr {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 32px 0;
+  .bm-rel-scope {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-faint);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin-left: 8px;
   }
-  .prose a {
-    color: var(--accent);
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.15s;
-  }
-  .prose a:hover { border-bottom-color: var(--accent); }
 
   footer {
     margin-top: 48px;
@@ -772,7 +823,7 @@
     <div class="meta" id="header-meta">—</div>
   </div>
   <nav class="tabs" id="tabs" aria-label="Sections">
-    <button type="button" data-tab="today"     class="tab-btn active" aria-selected="true">Today</button>
+    <button type="button" data-tab="today"     class="tab-btn active" aria-selected="true">Sessions</button>
     <button type="button" data-tab="plan"      class="tab-btn"        aria-selected="false">Plan</button>
     <button type="button" data-tab="exercises" class="tab-btn"        aria-selected="false">Exercises</button>
     <button type="button" data-tab="bodymind"  class="tab-btn"        aria-selected="false">Body &amp; Mind</button>
@@ -781,14 +832,19 @@
 
 <main>
   <div class="tab" data-tab="today">
-    <section id="sessions-section">
-      <h2>Sessions</h2>
-      <div id="sessions" class="loading"><div class="spinner"></div> Loading…</div>
+    <section id="next-section">
+      <h2>Next session</h2>
+      <div id="next" class="loading"><div class="spinner"></div> Loading…</div>
     </section>
 
     <section id="charts-section">
       <h2>Progression <span class="h2-sub">— last 30 days</span></h2>
       <div id="charts" class="loading"><div class="spinner"></div> Loading…</div>
+    </section>
+
+    <section id="log-section">
+      <h2>Log</h2>
+      <div id="log" class="loading"><div class="spinner"></div> Loading…</div>
     </section>
   </div>
 
@@ -807,16 +863,7 @@
   </div>
 
   <div class="tab" data-tab="bodymind" hidden>
-    <div class="bodymind-layout">
-      <aside class="bodymind-toc-sidebar" aria-label="Sections">
-        <div class="bodymind-toc-head">On this page</div>
-        <ol id="bodymind-toc-list"></ol>
-      </aside>
-      <section class="bodymind-main">
-        <nav class="bodymind-toc-chips" id="bodymind-toc-chips" aria-label="Sections"></nav>
-        <article id="bodymind" class="prose loading"><div class="spinner"></div> Loading…</article>
-      </section>
-    </div>
+    <div id="bodymind" class="loading"><div class="spinner"></div> Loading…</div>
   </div>
 </main>
 
@@ -827,7 +874,6 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 import Chart from 'https://esm.sh/chart.js@4.4.6/auto';
 // Chart.js v4 ships without a date adapter; this registers date-fns for the time scale.
 import 'https://esm.sh/chartjs-adapter-date-fns@3.0.0?deps=chart.js@4.4.6';
-import { marked } from 'https://esm.sh/marked@14.1.3';
 
 // ----- Config -----
 const CONFIG = {
@@ -873,6 +919,7 @@ const fmtWeight = (w) => {
   const r = Math.round(w * 10) / 10;
   return Number.isInteger(r) ? String(r) : r.toFixed(1);
 };
+const capitalizeFirst = (s) => s ? s[0].toUpperCase() + s.slice(1) : s;
 
 // Date helpers — we treat the `date` column as a calendar date (no tz).
 const parseDate = (s) => {
@@ -1204,34 +1251,42 @@ function roundToLoadable(w) {
 
 // ----- Renderers -----
 
-function renderSessions(idx) {
-  const root = $('sessions');
+function renderNext(idx) {
+  const root = $('next');
   root.classList.remove('loading');
   root.innerHTML = '';
 
-  const list = el('div', { class: 'session-list' });
-
-  // Upcoming session, expanded by default.
   const next = computeNext(idx);
-  if (next && !next.error) {
-    list.appendChild(buildNextCard(next));
-  } else if (next?.error) {
-    list.appendChild(el('div', { class: 'error' }, next.error));
+  if (next?.error) {
+    root.appendChild(el('div', { class: 'error' }, next.error));
+    return;
   }
+  if (!next) {
+    root.appendChild(el('div', { class: 'empty' }, 'No sessions logged yet. Add one through Claude.'));
+    return;
+  }
+  const list = el('div', { class: 'session-list' });
+  list.appendChild(buildNextCard(next));
+  root.appendChild(list);
+}
 
-  // Past sessions, newest first, collapsed.
+function renderLog(idx) {
+  const root = $('log');
+  root.classList.remove('loading');
+  root.innerHTML = '';
+
   const past = [...idx.sessionById.values()].sort((a, b) => {
     if (a.date !== b.date) return b.date.localeCompare(a.date);
     return b.id - a.id;
   }).slice(0, 10);
 
-  if (past.length === 0 && !next) {
-    root.appendChild(el('div', { class: 'empty' }, 'No sessions logged yet. Add one through Claude.'));
+  if (past.length === 0) {
+    root.appendChild(el('div', { class: 'empty' }, 'No past sessions yet.'));
     return;
   }
 
+  const list = el('div', { class: 'session-list' });
   for (const s of past) list.appendChild(buildPastCard(s, idx));
-
   root.appendChild(list);
 }
 
@@ -1604,96 +1659,133 @@ function renderExercises(idx) {
 
 function buildExerciseCard(lift, idx) {
   const card = el('div', { class: 'exercise-card' });
-
-  // Top row: name + (optional) latest weight
   const working = idx.workingByLift.get(lift.id) || [];
   const latestWeight = working.length ? Number(working[working.length - 1].weight) : null;
 
-  card.appendChild(el('div', { class: 'exercise-head' },
-    el('div', { class: 'exercise-name' }, lift.name),
-    latestWeight != null
-      ? el('div', { class: 'exercise-current' }, `${fmtWeight(latestWeight)} lb`)
-      : el('div', { class: 'exercise-current dim' }, '—')
-  ));
+  // Two-column body: info on the left, chart on the right at >=520px
+  const body = el('div', { class: 'exercise-body' });
+  const info = el('div', { class: 'exercise-info' });
 
-  // Meta line
-  const metaBits = [];
-  if (lift.category) metaBits.push(lift.category);
-  if (lift.equipment) metaBits.push(lift.equipment);
-  if (metaBits.length) {
-    card.appendChild(el('div', { class: 'exercise-meta' }, metaBits.join(' · ')));
+  // Top of left column: name, then the form-description link directly below
+  info.appendChild(el('div', { class: 'exercise-name' }, lift.name));
+
+  const noteText = lift.notes || (lift.video_url ? 'How to' : null);
+  if (noteText) {
+    if (lift.video_url) {
+      info.appendChild(el('a', {
+        class: 'exercise-link',
+        href: lift.video_url,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+      }, noteText));
+    } else {
+      info.appendChild(el('div', { class: 'exercise-notes' }, noteText));
+    }
   }
 
-  // Muscles
+  // Muscle chips
   const muscles = Array.isArray(lift.primary_muscles) ? lift.primary_muscles : [];
   if (muscles.length) {
     const chips = el('div', { class: 'muscle-chips' });
-    for (const m of muscles) chips.appendChild(el('span', { class: 'chip' }, m));
-    card.appendChild(chips);
+    for (const m of muscles) chips.appendChild(el('span', { class: 'chip' }, capitalizeFirst(m)));
+    info.appendChild(chips);
   }
 
-  if (lift.notes) {
-    card.appendChild(el('div', { class: 'exercise-notes' }, lift.notes));
+  // Bottom of left column: "Last 70 lb" anchored to the bottom of the card
+  if (latestWeight != null) {
+    info.appendChild(el('div', { class: 'exercise-last' },
+      el('span', { class: 'lbl' }, 'Last'),
+      el('span', { class: 'val' }, `${fmtWeight(latestWeight)} lb`)
+    ));
   }
 
-  // Progression chart — same component as the Today tab's grid.
+  body.appendChild(info);
+
+  // Right column: progression chart (full vertical span of the card)
   const { start: windowStart, end: windowEnd } = progressionWindow();
   const points = progressionPoints(lift, idx, windowStart, windowEnd);
   if (points.length > 0) {
+    const chartWrap = el('div', { class: 'exercise-chart-wrap' });
     const canvas = el('canvas', { class: 'exercise-chart' });
-    card.appendChild(canvas);
+    chartWrap.appendChild(canvas);
+    body.appendChild(chartWrap);
     queueMicrotask(() => renderProgressionChart(canvas, points, windowStart, windowEnd));
   }
 
-  // How-to link
-  if (lift.video_url) {
-    card.appendChild(el('a', {
-      class: 'exercise-link',
-      href: lift.video_url,
-      target: '_blank',
-      rel: 'noopener noreferrer',
-    }, 'How to · Alan Thrall'));
-  }
-
+  card.appendChild(body);
   return card;
 }
 
 // ----- Body & Mind tab -----
+//
+// Data shape (content/bodymind.json):
+//   concepts:   things that exist in the body (hormones, processes, nutrients...)
+//   practices:  things you do (lifting, walking, sleep, breath work...)
+//   principles: load-bearing ideas
+//   edges:      typed relations between any of the above (mostly practice→concept)
+//
+// Routing inside the tab uses hash-format `#bodymind/<id>` so the tab router
+// (which keys off the segment before the first `/`) keeps working.
 
-const BODYMIND_PATH = 'content/bodymind.md';
+const BODYMIND_PATH = 'content/bodymind.json';
 
-// Slugify a heading into a stable anchor id, prefixed so it can't collide
-// with the tab router's hashes (#today, #plan, ...).
-function bmSlug(text) {
-  return 'bm-' + text
-    .toLowerCase()
-    .replace(/&/g, ' and ')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
+const EDGE_LABELS = {
+  improves:    { affecting: 'improves',     affected: 'improved by' },
+  suppresses:  { affecting: 'suppresses',   affected: 'suppressed by' },
+  produces:    { affecting: 'produces',     affected: 'produced by' },
+  depletes:    { affecting: 'depletes',     affected: 'depleted by' },
+  depends_on:  { affecting: 'depends on',   affected: 'depended on by' },
+  blunts:      { affecting: 'blunts',       affected: 'blunted by' },
+  amplifies:   { affecting: 'amplifies',    affected: 'amplified by' },
+  engages:     { affecting: 'engages',      affected: 'engaged by' },
+};
+
+const EDGE_TONE = {
+  improves:   'good',
+  suppresses: 'bad',
+  produces:   'good',
+  depletes:   'neutral',
+  depends_on: 'neutral',
+  blunts:     'bad',
+  amplifies:  'good',
+  engages:    'good',
+};
+
+const BM_CATEGORY_LABELS = {
+  // concept categories
+  hormone: 'Hormones',
+  process: 'Processes',
+  nutrient: 'Nutrients',
+  brain: 'Brain',
+  nervous_system: 'Nervous system',
+  // practice categories
+  movement: 'Movement',
+  recovery: 'Recovery',
+  stressor: 'Stressors',
+  breath: 'Breath',
+  nutrition: 'Nutrition',
+};
+
+let bmData = null;     // loaded JSON
+let bmIndex = null;    // { byId: Map, edgesFrom: Map<id, edges>, edgesTo: Map<id, edges> }
 
 async function renderBodyMind() {
   const root = $('bodymind');
   try {
-    const res = await fetch(BODYMIND_PATH, { cache: 'no-cache' });
-    if (!res.ok) throw new Error(`Failed to load ${BODYMIND_PATH}: ${res.status}`);
-    const md = await res.text();
-
-    const html = marked.parse(md);
-    root.classList.remove('loading');
-    root.innerHTML = html;
-
-    // Add anchor ids to every h2 / h3 so the TOC and deep-links work.
-    const sections = [];
-    for (const h of root.querySelectorAll('h2, h3')) {
-      const id = bmSlug(h.textContent);
-      h.id = id;
-      if (h.tagName === 'H2') sections.push({ id, text: h.textContent });
+    if (!bmData) {
+      const res = await fetch(BODYMIND_PATH, { cache: 'no-cache' });
+      if (!res.ok) throw new Error(`Failed to load ${BODYMIND_PATH}: ${res.status}`);
+      bmData = await res.json();
+      bmIndex = indexBodyMind(bmData);
     }
-
-    buildBodyMindToc(sections);
-    wireBodyMindAnchors();
-    setupBodyMindScrollSpy(sections);
+    paintBodyMind();
+    // Repaint when the route inside the bodymind tab changes (e.g., #bodymind/sleep).
+    if (!renderBodyMind._wired) {
+      window.addEventListener('hashchange', () => {
+        if ((location.hash || '').startsWith('#bodymind')) paintBodyMind();
+      });
+      renderBodyMind._wired = true;
+    }
   } catch (err) {
     console.error(err);
     root.classList.remove('loading');
@@ -1702,75 +1794,199 @@ async function renderBodyMind() {
   }
 }
 
-function buildBodyMindToc(sections) {
-  const list = $('bodymind-toc-list');
-  const chips = $('bodymind-toc-chips');
-  if (list) {
-    list.innerHTML = '';
-    for (const s of sections) {
-      const a = el('a', { href: `#${s.id}`, 'data-anchor': s.id }, s.text);
-      list.appendChild(el('li', null, a));
-    }
+function indexBodyMind(data) {
+  const byId = new Map();
+  for (const c of data.concepts ?? [])   byId.set(c.id, { ...c, _kind: 'concept' });
+  for (const p of data.practices ?? [])  byId.set(p.id, { ...p, _kind: 'practice' });
+  for (const p of data.principles ?? []) byId.set(p.id, { ...p, _kind: 'principle' });
+  const edgesFrom = new Map();
+  const edgesTo = new Map();
+  for (const e of data.edges ?? []) {
+    if (!edgesFrom.has(e.from)) edgesFrom.set(e.from, []);
+    if (!edgesTo.has(e.to))     edgesTo.set(e.to, []);
+    edgesFrom.get(e.from).push(e);
+    edgesTo.get(e.to).push(e);
   }
-  if (chips) {
-    chips.innerHTML = '';
-    for (const s of sections) {
-      chips.appendChild(el('a', {
-        class: 'bm-chip',
-        href: `#${s.id}`,
-        'data-anchor': s.id,
-      }, s.text));
-    }
+  return { byId, edgesFrom, edgesTo };
+}
+
+// `#bodymind/<id>` → render detail; `#bodymind` → render hub.
+function paintBodyMind() {
+  const root = $('bodymind');
+  root.classList.remove('loading');
+  root.innerHTML = '';
+
+  const hash = location.hash || '';
+  const m = hash.match(/^#bodymind\/(.+)$/);
+  const detailId = m ? decodeURIComponent(m[1]) : null;
+
+  if (detailId && bmIndex.byId.has(detailId)) {
+    root.appendChild(buildBodyMindDetail(bmIndex.byId.get(detailId)));
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  } else {
+    root.appendChild(buildBodyMindHub());
   }
 }
 
-// Override default anchor behavior: smooth scroll, but DON'T let the click
-// rewrite the URL hash to something the tab router will then misinterpret.
-// We keep the tab hash (#bodymind) and use a query-style fragment for scroll
-// positions only when the user explicitly chooses one.
-function wireBodyMindAnchors() {
-  for (const a of document.querySelectorAll('[data-anchor]')) {
-    a.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      const id = a.dataset.anchor;
-      const target = document.getElementById(id);
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+// ---- Hub ----
+
+function buildBodyMindHub() {
+  const wrap = el('div', { class: 'bm-hub' });
+
+  wrap.appendChild(el('div', { class: 'bm-hub-intro' },
+    el('div', { class: 'bm-hub-title' }, 'Body & Mind'),
+    el('div', { class: 'bm-hub-sub' }, 'The biology and practice behind everything I\'m doing. Tap any node to dive in.')
+  ));
+
+  wrap.appendChild(buildBodyMindSection('Concepts',   bmData.concepts,  'concept'));
+  wrap.appendChild(buildBodyMindSection('Practices',  bmData.practices, 'practice'));
+  wrap.appendChild(buildBodyMindSection('Principles', bmData.principles, 'principle'));
+
+  return wrap;
+}
+
+function buildBodyMindSection(title, items, kind) {
+  const section = el('section', { class: 'bm-section' });
+  section.appendChild(el('h3', { class: 'bm-section-head' }, title));
+
+  // Group by category if items have one; otherwise flat.
+  const byCat = new Map();
+  for (const it of items) {
+    const cat = it.category || '';
+    if (!byCat.has(cat)) byCat.set(cat, []);
+    byCat.get(cat).push(it);
+  }
+
+  for (const [cat, group] of byCat) {
+    if (cat) section.appendChild(el('div', { class: 'bm-cat-head' }, BM_CATEGORY_LABELS[cat] || cat));
+    const grid = el('div', { class: 'bm-card-grid' });
+    for (const it of group) grid.appendChild(buildBodyMindCard(it, kind));
+    section.appendChild(grid);
+  }
+
+  return section;
+}
+
+function buildBodyMindCard(item, kind) {
+  return el('a', {
+    class: `bm-card bm-card-${kind}`,
+    href: `#bodymind/${item.id}`,
+  },
+    el('span', { class: 'bm-card-name' }, item.name),
+    item.blurb
+      ? el('span', { class: 'bm-card-blurb' }, ' — ' + item.blurb)
+      : null,
+  );
+}
+
+// ---- Detail ----
+
+function buildBodyMindDetail(item) {
+  const wrap = el('div', { class: 'bm-detail' });
+
+  wrap.appendChild(el('a', {
+    class: 'bm-back',
+    href: '#bodymind',
+  }, '← Back'));
+
+  wrap.appendChild(el('div', { class: 'bm-detail-kind' },
+    item._kind.toUpperCase(),
+    item.category ? el('span', { class: 'sep' }, ' · ') : null,
+    item.category ? (BM_CATEGORY_LABELS[item.category] || item.category) : null,
+  ));
+  wrap.appendChild(el('h2', { class: 'bm-detail-title' }, item.name));
+
+  if (item.dose) wrap.appendChild(el('div', { class: 'bm-detail-dose' }, item.dose));
+  if (item.blurb) wrap.appendChild(el('p', { class: 'bm-detail-blurb' }, item.blurb));
+
+  // Body — render the structured fields each entity type may carry.
+  const body = el('div', { class: 'bm-detail-body' });
+
+  // Practice fields
+  appendBodyMindBlock(body, 'How', item.how);
+  appendBodyMindBlock(body, 'When', item.when);
+  appendBodyMindBlock(body, 'Warnings', item.warnings, 'bad');
+
+  // Concept fields
+  appendBodyMindBlock(body, 'Good signaling', item.good_when, 'good');
+  appendBodyMindBlock(body, 'Bad signaling', item.bad_when, 'bad');
+  appendBodyMindBlock(body, 'Raises (chronic)', item.raises_chronic, 'bad');
+  appendBodyMindBlock(body, 'Lowers (chronic)', item.lowers_chronic, 'good');
+  appendBodyMindBlock(body, 'Raised by', item.raised_by, 'good');
+  appendBodyMindBlock(body, 'Amplified by', item.amplified_by, 'good');
+  appendBodyMindBlock(body, 'Starvation signs', item.starvation_signs, 'bad');
+  appendBodyMindBlock(body, 'Sleep architecture', item.architecture);
+  appendBodyMindBlock(body, 'What helps', item.helpers, 'good');
+  appendBodyMindBlock(body, 'What hurts', item.blockers, 'bad');
+
+  // Generic
+  appendBodyMindBlock(body, 'Details', item.details);
+
+  wrap.appendChild(body);
+
+  // Relations panels
+  const out = bmIndex.edgesFrom.get(item.id) || [];
+  const inn = bmIndex.edgesTo.get(item.id) || [];
+  if (out.length) wrap.appendChild(buildRelationsPanel('What this affects', out, 'affecting'));
+  if (inn.length) wrap.appendChild(buildRelationsPanel('What affects this', inn, 'affected'));
+
+  return wrap;
+}
+
+function appendBodyMindBlock(parent, title, value, tone) {
+  if (value == null) return;
+  if (Array.isArray(value)) {
+    if (value.length === 0) return;
+    parent.appendChild(el('h4', { class: 'bm-block-head' }, title));
+    const ul = el('ul', { class: `bm-list ${tone ? `tone-${tone}` : ''}` });
+    for (const v of value) ul.appendChild(el('li', null, v));
+    parent.appendChild(ul);
+  } else {
+    parent.appendChild(el('h4', { class: 'bm-block-head' }, title));
+    parent.appendChild(el('p', { class: `bm-para ${tone ? `tone-${tone}` : ''}` }, String(value)));
   }
 }
 
-// Scroll-spy: highlight the chip / sidebar entry whose section is currently
-// nearest the top of the viewport.
-function setupBodyMindScrollSpy(sections) {
-  if (sections.length === 0) return;
-  const ids = sections.map((s) => s.id);
+function buildRelationsPanel(title, edges, side) {
+  const panel = el('section', { class: 'bm-rels' });
+  panel.appendChild(el('h4', { class: 'bm-block-head' }, title));
+  const list = el('div', { class: 'bm-rel-list' });
 
-  const update = () => {
-    const panel = document.querySelector('.tab[data-tab="bodymind"]');
-    if (!panel || panel.hidden) return;
-    const probe = 120; // px from top — anchor's "active" zone
-    let activeId = ids[0];
-    for (const id of ids) {
-      const e = document.getElementById(id);
-      if (!e) continue;
-      const top = e.getBoundingClientRect().top;
-      if (top - probe <= 0) activeId = id;
-      else break;
-    }
-    for (const node of document.querySelectorAll('[data-anchor]')) {
-      node.classList.toggle('active', node.dataset.anchor === activeId);
-    }
-  };
+  for (const e of edges) {
+    const otherId = side === 'affecting' ? e.to : e.from;
+    const other = bmIndex.byId.get(otherId);
+    if (!other) continue;
+    const verb = (EDGE_LABELS[e.type] || {})[side] || e.type;
+    const tone = EDGE_TONE[e.type] || 'neutral';
 
-  window.addEventListener('scroll', update, { passive: true });
-  // Run once after layout settles so the first chip is highlighted.
-  setTimeout(update, 0);
+    const row = el('a', {
+      class: `bm-rel tone-${tone}`,
+      href: `#bodymind/${otherId}`,
+    },
+      el('span', { class: 'bm-rel-verb' }, verb),
+      el('span', { class: 'bm-rel-name' }, other.name),
+      other.blurb
+        ? el('span', { class: 'bm-rel-desc' }, ' — ' + other.blurb)
+        : null,
+      e.scope ? el('span', { class: 'bm-rel-scope' }, e.scope.replace(/_/g, ' ')) : null,
+    );
+    list.appendChild(row);
+  }
+  panel.appendChild(list);
+  return panel;
 }
 
 // ----- Tabs -----
 const TABS = ['today', 'plan', 'exercises', 'bodymind'];
 
-function activateTab(name) {
+// Tabs may have sub-routes (e.g. #bodymind/sleep). Use only the segment
+// before the first `/` to decide which tab is active.
+function tabFromHash() {
+  const raw = (location.hash || '#today').slice(1);
+  return raw.split('/')[0] || 'today';
+}
+
+function activateTab(name, { replaceHash = true } = {}) {
   if (!TABS.includes(name)) name = 'today';
   for (const btn of document.querySelectorAll('#tabs .tab-btn')) {
     const active = btn.dataset.tab === name;
@@ -1780,8 +1996,11 @@ function activateTab(name) {
   for (const panel of document.querySelectorAll('main > .tab')) {
     panel.hidden = panel.dataset.tab !== name;
   }
-  // Reflect in hash for reloads / back button.
-  if (location.hash !== `#${name}`) history.replaceState(null, '', `#${name}`);
+  // Reflect in hash only when asked. Avoid clobbering sub-routes (e.g.
+  // hashchange fires for #bodymind/sleep — we shouldn't rewrite to #bodymind).
+  if (replaceHash && tabFromHash() !== name) {
+    history.replaceState(null, '', `#${name}`);
+  }
 }
 
 function wireTabs() {
@@ -1789,9 +2008,9 @@ function wireTabs() {
     btn.addEventListener('click', () => activateTab(btn.dataset.tab));
   }
   window.addEventListener('hashchange', () => {
-    activateTab((location.hash || '#today').slice(1));
+    activateTab(tabFromHash(), { replaceHash: false });
   });
-  activateTab((location.hash || '#today').slice(1));
+  activateTab(tabFromHash(), { replaceHash: false });
 }
 
 // ----- Boot -----
@@ -1806,15 +2025,16 @@ async function boot() {
     const headerMeta = newest ? `${data.sessions.length} sessions · last ${fmtDateShort(newest.date)}` : 'no data';
     $('header-meta').textContent = headerMeta;
 
-    renderSessions(idx);
+    renderNext(idx);
     renderCharts(idx, data.lifts);
+    renderLog(idx);
     renderPlan(idx);
     renderExercises(idx);
     renderBodyMind();
   } catch (err) {
     console.error(err);
     const msg = err && err.message ? err.message : String(err);
-    for (const id of ['sessions', 'charts', 'plan', 'exercises', 'bodymind']) {
+    for (const id of ['next', 'charts', 'log', 'plan', 'exercises', 'bodymind']) {
       const e = $(id);
       if (!e) continue;
       e.classList.remove('loading');
