@@ -1,63 +1,114 @@
 # Set up your own lifting tracker
 
-This is the source for [jcontini.github.io/workouts](https://jcontini.github.io/workouts/) — a static, read-only dashboard for a barbell-lifting program. It connects directly to your own Supabase project, deploys to your own GitHub Pages, and lets you log new workouts by chatting with Claude.
+This is the source for [jcontini.github.io/workouts](https://jcontini.github.io/workouts/) — a private dashboard for a barbell-lifting program. It connects to your own database, deploys as a free public web page, and lets you log new workouts by chatting with Claude.
 
-To set up your own copy:
+You don't need to know how to code or use a terminal. An AI walks you through everything.
 
-1. Open Claude Code on your computer (or [claude.ai/code](https://claude.ai/code))
-2. Optionally start it in `--dangerously-skip-permissions` mode so you don't have to approve every command
-3. Paste this prompt and send:
+## How it works
+
+1. **Get Claude Code on your computer** — it's a chat app with a "hands" — it can run things on your machine for you.
+   - macOS / Windows / Linux: download from <https://claude.com/claude-code>
+2. Open it. You'll see a chat box.
+3. **Optional but recommended:** start Claude Code with `--dangerously-skip-permissions` so it doesn't pause every few seconds asking for approval. (You can also approve as you go — your choice.)
+4. **Copy the prompt below** (use the Copy button) and paste it into Claude Code. Press Enter.
 
 ```
 I want to set up my own lifting tracker like https://jcontini.github.io/workouts/.
 
 Please fetch the full instructions at https://jcontini.github.io/workouts/content/setup.md and walk me through it. The instructions are written for you — follow them top to bottom. Ask me questions as you need them. If we run out of context partway through, remind me to save the URL above to your memory so we can resume in a new session.
+
+I am non-technical. Don't ask me to do anything in a terminal — you do it. The only things I'll do myself are: sign up for a couple of websites in my browser when you tell me to, and confirm/approve actions when you ask. That's it.
 ```
 
-That's it. The AI does the rest. Below is what it'll be following.
+5. Answer Claude's questions as it goes. Approve actions when it asks. The whole setup takes about 15-30 minutes, depending on how fast the websites load.
+
+That's it. The rest of this page is technical instructions written *for the AI*. You don't need to read them.
 
 ---
 
 ## Instructions for Claude (the AI reading this)
 
-You're helping a non-technical user clone a personal lifting tracker. The end state is:
+You're helping a **non-technical user** clone a personal lifting tracker. The end state is:
 
-- Their own GitHub repo (forked or scaffolded from this one) deployed to their own GitHub Pages URL.
+- Their own GitHub repo (scaffolded from this one) deployed to their own GitHub Pages URL.
 - Their own Supabase project, with the same schema, RLS configured for read-only anon access.
-- The user can log new sessions through you in chat (writes go through the Supabase MCP using the service_role key, never through the deployed site).
+- The user can log new sessions through you in chat (writes go through the Supabase MCP using the service-role key, never through the deployed site).
 
-Treat this whole document as the spec. Read it end-to-end before starting so you can pace the conversation. Be friendly and concrete. The user is non-technical — never ask them to edit code by hand if you can do it for them.
+### How to behave
 
-### What's already true vs. what you need to verify
+- The user is non-technical. They almost certainly haven't used a terminal before. Don't assume they know what "command line", "Homebrew", "git", "shell", "package manager" mean. If you need to use those words, define them inline. ("Homebrew is a tool that installs other tools — like an app store for the terminal.")
+- **Never ask them to type into a terminal**. You have shell access; you do it. They watch.
+- **Never ask them to edit a code file**. You have file-editing tools; you do it.
+- **Do ask them to do things in the browser** when there's no other way: sign up for accounts, copy access tokens, click "Authorize" on OAuth flows. Make those steps very explicit — tell them exactly what URL to open, what to click, what to copy back to you.
+- Be friendly and concrete. After each phase, tell them what you just did and what's about to happen next, in plain English. ("Just installed the GitHub command-line tool. Next we're going to log you into your GitHub account — your browser will pop up.")
+- Treat any token or password as a secret. Once they paste it, don't echo it back. Don't write it to disk in plaintext anywhere except the MCP config you control.
+- If something errors, don't dump a stack trace at them. Diagnose silently, then tell them what's happening in one sentence and what you're going to try.
 
-Don't assume anything about the user's environment. Run quick checks. The likely state of a non-technical user's machine:
+### Probing the environment
 
-- `git` — usually present on macOS / Linux
-- `gh` (GitHub CLI) — often missing
-- A GitHub account — they probably have one but might not be authenticated locally
-- A Supabase account — probably don't have one yet
+Don't assume anything about their machine. Run quick non-destructive checks first to see what's there:
+
+- `uname -a` — what OS
+- `which git`, `which gh`, `which brew`, `which python3`
+- `gh auth status` (will fail noisily if not signed in — that's fine, you're just probing)
+
+Likely state of a non-technical user's macOS machine:
+
+- `git` — present (Apple ships it; first run may trigger an Xcode Command Line Tools prompt)
+- `gh` — missing
+- `brew` — missing
+- A GitHub account — maybe; they may not have used it on this machine
+- A Supabase account — probably not yet
 - Claude Code MCP servers — Supabase MCP is not installed by default
 
-Use `which gh`, `gh auth status`, `git --version` to probe. Don't assume.
+### Phase 1 — Install Homebrew (only if missing, only on macOS / Linux)
 
-### Phase 1 — GitHub access
+If `which brew` returns nothing on macOS or Linux, install it. The official one-liner is at <https://brew.sh>. As of late 2025 it's:
 
-1. Confirm `gh` is installed. If not, install it. On macOS that's `brew install gh`. If they don't have Homebrew, point them at <https://brew.sh> and install Homebrew first.
-2. Confirm `gh auth status`. If not authenticated, run `gh auth login` and walk them through the browser flow.
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 
-### Phase 2 — Supabase account + access token
+Important nuances:
 
-This is the only step the user has to do in a browser. Don't try to automate it.
+- The Homebrew installer is **interactive** — it pauses for the user to press Return and may prompt for their macOS password (the one they log into the computer with). Tell them this is happening and that the password prompt is real and from their computer, not from you.
+- After install on Apple Silicon Macs, the installer prints a "Next steps" block with two `eval` commands to add Homebrew to the shell PATH. Run those in a way that takes effect for your subsequent commands.
+- On Windows, there is no Homebrew. Use winget instead: `winget install --id GitHub.cli` for `gh`. Confirm `winget` exists first.
 
-1. Tell the user to go to <https://supabase.com> and sign up (free tier is fine). They'll create an organization as part of signup.
-2. Once they're logged in, they need a **personal access token** so Claude Code can manage their projects via MCP. Walk them to:
-   - <https://supabase.com/dashboard/account/tokens>
-   - Click "Generate new token", name it "Claude Code", copy the token
-3. Tell them to paste the token into chat. **Treat the token as a secret** — once you have it, don't echo it back, don't write it to disk in plaintext anywhere except the MCP config.
+If they're on macOS and `git --version` triggers the Xcode Command Line Tools prompt, walk them through clicking "Install" in the dialog that pops up; this also gets them `git` if it wasn't there.
 
-### Phase 3 — Install the Supabase MCP
+### Phase 2 — Install the GitHub CLI
 
-Add the official Supabase MCP server to their Claude Code config. Use `claude mcp add` if you have shell access:
+```
+brew install gh
+```
+
+(Or `winget install --id GitHub.cli` on Windows.)
+
+### Phase 3 — GitHub account + auth
+
+1. Run `gh auth status`. If logged in, skip.
+2. If not, run `gh auth login`. This is interactive — it will:
+   - Ask which host (choose `GitHub.com`)
+   - Ask which protocol (choose `HTTPS` for non-technical users — easier than SSH)
+   - Ask whether to authenticate with a web browser (yes)
+   - Print a one-time code and open the user's browser to <https://github.com/login/device>
+3. Tell the user: "Your browser is going to open. Paste this code: `XXXX-XXXX`. Click 'Authorize'. Come back here when done."
+4. If the user doesn't have a GitHub account yet, the same flow lets them sign up. Walk them through it.
+
+### Phase 4 — Supabase account + access token
+
+Supabase is the database service the dashboard talks to. This is the one step that genuinely requires the user's hands — they need to sign up in their browser. Open the browser for them with `open https://supabase.com` (macOS) / `xdg-open https://supabase.com` (Linux) / `start https://supabase.com` (Windows) so they don't have to copy-paste the URL.
+
+Walk them through it like this:
+
+1. **Sign up.** "Your browser is opening to supabase.com. Click 'Start your project' and sign up — you can use Google or GitHub for one-click signup. The free tier is what we want — no credit card needed." Wait for them to confirm they're logged in.
+2. **Get an access token** so you can manage their projects on their behalf. Open a second tab for them: `open https://supabase.com/dashboard/account/tokens`. Tell them: "On this page, click 'Generate new token'. Name it 'Claude Code'. Copy the token that appears — you'll only see it once. Paste it back into this chat."
+3. When they paste the token, **treat it as a secret**. Don't echo it back. Don't write it to disk anywhere except the MCP config you'll write next.
+
+### Phase 5 — Install the Supabase MCP
+
+The Supabase MCP is a small program that lets you (the AI) talk to the user's Supabase database directly. Install it for them:
 
 ```
 claude mcp add supabase \
@@ -65,9 +116,11 @@ claude mcp add supabase \
   -- npx -y @supabase/mcp-server-supabase@latest
 ```
 
-After installing, you'll need them to restart Claude Code (or `/mcp reload` if their version supports it) so the MCP tools become available to you. Confirm by checking that you have a `mcp__supabase__list_organizations` (or similarly-named) tool available. If not, troubleshoot before proceeding.
+After installing, the user needs to **restart Claude Code** for the MCP to load — you can't restart your own host process. Tell them: "I just connected your database. Quit Claude Code and reopen it, then say 'continue setup' and I'll pick up from here."
 
-### Phase 4 — Create the Supabase project
+When they're back, confirm a Supabase tool is available (e.g. `mcp__supabase__list_organizations`). If not, troubleshoot before proceeding.
+
+### Phase 6 — Create the Supabase project
 
 Using the MCP:
 
@@ -76,7 +129,7 @@ Using the MCP:
 3. Wait for it to finish provisioning (status `ACTIVE_HEALTHY`).
 4. Get the project URL and the **publishable** anon key (sometimes shown as "anon key" or "publishable key" — it's the public one, safe to expose). The MCP has `get_project_url` and `get_publishable_keys` for this.
 
-### Phase 5 — Schema
+### Phase 7 — Schema
 
 Apply this migration to their project. Use the Supabase MCP's `apply_migration` (DDL).
 
@@ -156,7 +209,7 @@ create table public.sets (
 );
 ```
 
-### Phase 6 — Lock down with RLS (critical)
+### Phase 8 — Lock down with RLS (critical)
 
 The browser will hold the publishable anon key. Without RLS, anyone can write to the database. Apply this migration:
 
@@ -189,7 +242,7 @@ curl -s "$SUPABASE_URL/rest/v1/sessions" \
 
 Expected response includes `"code":"42501"` or similar RLS-violation message. If the insert succeeds, **stop** and fix the policies before continuing — you've just confirmed they have an open database.
 
-### Phase 7 — Seed data (optional but recommended)
+### Phase 9 — Seed data (optional but recommended)
 
 Most users following this guide want StrongLifts 5×5 as a starting program. Insert it via `execute_sql`:
 
@@ -228,9 +281,9 @@ from (values
 
 Ask the user before running this — some users may want a blank slate or a different program.
 
-### Phase 8 — Clone the dashboard repo
+### Phase 10 — Clone the dashboard repo
 
-Use `gh repo create` from the template. The user wants their own copy, not a fork tied to the upstream:
+Scaffold a fresh copy of the dashboard into the user's home folder. Don't make them choose a path — just put it at `~/workouts` (a folder named "workouts" inside their home directory). They never need to `cd` to it themselves; you'll do everything for them.
 
 ```
 git clone https://github.com/jcontini/workouts ~/workouts
@@ -240,9 +293,9 @@ git init -b main
 gh repo create workouts --public --source=. --description "My lifting tracker"
 ```
 
-(Adjust `~/workouts` to wherever the user wants the working directory. Ask.)
+If `~/workouts` already exists, ask the user whether they want to overwrite it or pick a different name (e.g. `~/workouts-mine`).
 
-### Phase 9 — Wire the user's Supabase project into index.html
+### Phase 11 — Wire the user's Supabase project into index.html
 
 Edit the `CONFIG` block at the top of `index.html`. Replace the two values:
 
@@ -256,7 +309,7 @@ const CONFIG = {
 
 Use `Read` + `Edit`. Don't have the user touch the file by hand.
 
-### Phase 10 — Commit and deploy
+### Phase 12 — Commit and deploy
 
 ```
 git add -A
@@ -267,15 +320,15 @@ gh api -X POST repos/<user>/workouts/pages -f 'source[branch]=main' -f 'source[p
 
 Wait ~30 seconds for Pages to build, then `curl -I https://<user>.github.io/workouts/` until it returns 200.
 
-### Phase 11 — Verify
+### Phase 13 — Verify
 
-Open the live URL. The "Sessions" tab should load with empty progression charts and a "Next session" card showing the program's first workout.
+Open the live URL in their browser for them: `open https://<user>.github.io/workouts/`. The "Sessions" tab should load with empty progression charts and a "Next session" card showing the program's first workout.
 
-Then ask the user to log their first session in chat ("yesterday I did Workout A, Squat 5×5 at 65 lb all sets cleared...") and have them refresh the site to confirm it appears.
+Tell the user: "Your dashboard is live at https://<user>.github.io/workouts/. To log a workout, just tell me about it — for example: 'today I did Workout A, Squat 5×5 at 65 lb all sets cleared, Bench 5×5 at 50 missed last set'. I'll add it to your database. Refresh the page in your browser and you'll see the data."
 
 ### Important notes
 
-- **The publishable anon key is safe to commit** to a public repo — its only privileges are what RLS grants. Phase 6 is what makes the key safe.
+- **The publishable anon key is safe to commit** to a public repo — its only privileges are what RLS grants. Phase 8 is what makes the key safe.
 - **The personal access token is NOT safe to commit.** It lives in the user's local Claude MCP config only.
 - **The service role key is NEVER part of the deployed app.** Writes happen from the user's machine through the MCP, using a key only Claude has access to.
 - If the user's session ends and they want to resume in a new conversation, suggest they save a memory entry with this URL so the next agent can re-fetch the instructions.
