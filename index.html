@@ -1,0 +1,1129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0a0a" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Lifts" />
+<title>Lifts</title>
+<link rel="preconnect" href="https://vwejipgsculrwustpooe.supabase.co" />
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-elev: #111111;
+    --bg-elev-2: #161616;
+    --border: #232323;
+    --border-strong: #2e2e2e;
+    --text: #f4f4f5;
+    --text-dim: #a1a1aa;
+    --text-faint: #71717a;
+    --accent: #d97757;
+    --accent-dim: rgba(217, 119, 87, 0.15);
+    --good: #4ade80;
+    --bad: #f87171;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --font: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+
+  body {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: max(20px, env(safe-area-inset-top)) 20px max(40px, env(safe-area-inset-bottom));
+  }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  header h1 {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  header .meta {
+    font-size: 12px;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  section {
+    margin-bottom: 44px;
+  }
+
+  section > h2 {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 0 0 14px 0;
+  }
+
+  /* Loading */
+  .loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-dim);
+    font-size: 14px;
+    padding: 24px 0;
+  }
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border-strong);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty {
+    color: var(--text-faint);
+    font-size: 13px;
+    padding: 12px 14px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+  }
+
+  .error {
+    color: var(--bad);
+    font-size: 13px;
+    padding: 12px 14px;
+    border: 1px solid #3f1d1d;
+    background: #1a0e0e;
+    border-radius: var(--radius);
+    font-family: var(--mono);
+  }
+
+  /* Up Next */
+  .next-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+    overflow: hidden;
+  }
+
+  .next-card .header-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .next-card .label {
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+  .next-card .badge {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+  }
+
+  .lift-row {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .lift-row:last-child { border-bottom: none; }
+
+  .lift-row .top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .lift-row .name {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .lift-row .weight {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .lift-row .weight .unit {
+    color: var(--text-faint);
+    font-size: 13px;
+    font-weight: 400;
+    margin-left: 3px;
+  }
+  .lift-row .meta-line {
+    display: flex;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .lift-row .meta-line .plates {
+    color: var(--text-faint);
+  }
+  .lift-row .meta-line .delta-up { color: var(--good); }
+  .lift-row .meta-line .delta-down { color: var(--bad); }
+  .lift-row .meta-line .delta-flat { color: var(--text-faint); }
+  .lift-row .meta-line .warn {
+    color: #fbbf24;
+  }
+
+  /* Recent sessions */
+  .session-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .session {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .session.expanded {
+    border-color: var(--border-strong);
+  }
+  .session > .summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .session > .summary:active {
+    background: var(--bg-elev-2);
+  }
+  .session .date {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    min-width: 56px;
+  }
+  .session .label {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    background: var(--bg-elev-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+  .session .lifts-summary {
+    flex: 1;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .session .ok { color: var(--good); }
+  .session .miss { color: var(--bad); }
+  .session .chevron {
+    color: var(--text-faint);
+    font-size: 12px;
+    transition: transform 0.15s;
+  }
+  .session.expanded .chevron {
+    transform: rotate(90deg);
+  }
+  .session > .detail {
+    display: none;
+    padding: 4px 14px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-elev-2);
+  }
+  .session.expanded > .detail {
+    display: block;
+  }
+  .detail-lift {
+    margin-top: 10px;
+  }
+  .detail-lift .name {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .detail-lift .sets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .detail-lift .set-pill {
+    padding: 2px 7px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-elev);
+  }
+  .detail-lift .set-pill.miss { color: var(--bad); border-color: #3f1d1d; }
+  .session-notes {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: var(--bg-elev);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  /* Charts */
+  .charts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  @media (min-width: 600px) {
+    .charts { grid-template-columns: 1fr 1fr; }
+  }
+  .chart-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+    padding: 14px;
+  }
+  .chart-card .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .chart-card .name {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .chart-card .latest {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .chart-card canvas {
+    width: 100% !important;
+    height: 130px !important;
+  }
+
+  /* Stats */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  @media (min-width: 600px) {
+    .stats { grid-template-columns: repeat(4, 1fr); }
+  }
+  .stat {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+    padding: 14px;
+  }
+  .stat .v {
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .stat .k {
+    font-size: 11px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 6px;
+  }
+
+  footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-faint);
+    text-align: center;
+    font-family: var(--mono);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Lifts</h1>
+  <div class="meta" id="header-meta">—</div>
+</header>
+
+<section id="next-section">
+  <h2>Up Next</h2>
+  <div id="next" class="loading"><div class="spinner"></div> Loading…</div>
+</section>
+
+<section id="recent-section">
+  <h2>Recent Sessions</h2>
+  <div id="recent" class="loading"><div class="spinner"></div> Loading…</div>
+</section>
+
+<section id="charts-section">
+  <h2>Progression</h2>
+  <div id="charts" class="loading"><div class="spinner"></div> Loading…</div>
+</section>
+
+<section id="stats-section">
+  <h2>Stats</h2>
+  <div id="stats" class="loading"><div class="spinner"></div> Loading…</div>
+</section>
+
+<footer>read-only · writes via Claude</footer>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+import Chart from 'https://esm.sh/chart.js@4.4.6/auto';
+
+// ----- Config -----
+const CONFIG = {
+  supabaseUrl: 'https://vwejipgsculrwustpooe.supabase.co',
+  supabaseAnonKey: 'sb_publishable_EeD2Lxd2PLkGfRu-AQWuhA_yhPi0WCE',
+  barWeightLbs: 45,
+  availablePlates: [45, 25, 10, 5, 2.5],
+};
+
+// Main lifts shown in the progression chart grid, in standard StrongLifts order.
+const MAIN_LIFTS = ['Squat', 'Bench Press', 'Barbell Row', 'Overhead Press', 'Deadlift'];
+const MAIN_LIFT_ALIASES = {
+  'Squat': ['Squat', 'Back Squat', 'Barbell Squat'],
+  'Bench Press': ['Bench Press', 'Bench'],
+  'Barbell Row': ['Barbell Row', 'Pendlay Row', 'Row'],
+  'Overhead Press': ['Overhead Press', 'OHP', 'Press', 'Standing Press'],
+  'Deadlift': ['Deadlift', 'Conventional Deadlift'],
+};
+
+// ----- Supabase -----
+const supa = createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey, {
+  auth: { persistSession: false },
+});
+
+// ----- Tiny DOM helpers -----
+const $ = (id) => document.getElementById(id);
+const el = (tag, attrs = {}, ...children) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') e.className = v;
+    else if (k === 'style') e.setAttribute('style', v);
+    else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
+    else if (v != null) e.setAttribute(k, v);
+  }
+  for (const c of children.flat()) {
+    if (c == null || c === false) continue;
+    e.appendChild(typeof c === 'string' || typeof c === 'number' ? document.createTextNode(String(c)) : c);
+  }
+  return e;
+};
+const fmtInt = (n) => Math.round(n).toLocaleString('en-US');
+const fmtWeight = (w) => {
+  const r = Math.round(w * 10) / 10;
+  return Number.isInteger(r) ? String(r) : r.toFixed(1);
+};
+
+// Date helpers — we treat the `date` column as a calendar date (no tz).
+const parseDate = (s) => {
+  // s is "YYYY-MM-DD"; build local date so display matches the gym day.
+  const [y, m, d] = s.split('-').map(Number);
+  return new Date(y, m - 1, d);
+};
+const fmtDateShort = (s) => {
+  const d = parseDate(s);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
+const today = () => new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+const daysBetween = (a, b) => Math.round((b - a) / 86400000);
+
+// ----- Plate math -----
+// Returns { plates: [25, 10, 2.5, ...], remainder, exact: bool }
+function platesPerSide(targetWeight, bar = CONFIG.barWeightLbs, plates = CONFIG.availablePlates) {
+  const sideWeight = (targetWeight - bar) / 2;
+  if (sideWeight < 0) return { plates: [], remainder: targetWeight - bar, exact: false };
+  if (sideWeight === 0) return { plates: [], remainder: 0, exact: true };
+  let remaining = sideWeight;
+  const used = [];
+  for (const p of [...plates].sort((a, b) => b - a)) {
+    while (remaining >= p - 1e-9) {
+      used.push(p);
+      remaining = Math.round((remaining - p) * 100) / 100;
+    }
+  }
+  const exact = Math.abs(remaining) < 1e-6;
+  return { plates: used, remainder: remaining, exact };
+}
+
+function plateString(targetWeight) {
+  const { plates, remainder, exact } = platesPerSide(targetWeight);
+  if (targetWeight < CONFIG.barWeightLbs) return 'bar only (under bar weight)';
+  if (plates.length === 0 && targetWeight === CONFIG.barWeightLbs) return 'bar only';
+  // Group identical plates: e.g. [25, 10, 2.5] -> "1×25, 1×10, 1×2.5"
+  const counts = new Map();
+  for (const p of plates) counts.set(p, (counts.get(p) || 0) + 1);
+  const parts = [...counts.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .map(([w, c]) => `${c}×${fmtWeight(w)}`);
+  let s = parts.join(' + ');
+  if (!exact) s += ` (+${fmtWeight(remainder)} short)`;
+  return s + ' /side';
+}
+
+// ----- Data fetch -----
+async function fetchAll() {
+  // Fetch in parallel. Programs/lifts are tiny lookup tables.
+  const [programsRes, liftsRes, sessionsRes, setsRes] = await Promise.all([
+    supa.from('programs').select('*'),
+    supa.from('lifts').select('*'),
+    supa.from('sessions').select('*').order('date', { ascending: false }).order('id', { ascending: false }),
+    supa.from('sets').select('*'),
+  ]);
+  for (const r of [programsRes, liftsRes, sessionsRes, setsRes]) {
+    if (r.error) throw new Error(r.error.message);
+  }
+  return {
+    programs: programsRes.data ?? [],
+    lifts: liftsRes.data ?? [],
+    sessions: sessionsRes.data ?? [],
+    sets: setsRes.data ?? [],
+  };
+}
+
+// ----- Indexing -----
+function indexData({ programs, lifts, sessions, sets }) {
+  const programById = new Map(programs.map((p) => [p.id, p]));
+  const liftById = new Map(lifts.map((l) => [l.id, l]));
+  const sessionById = new Map(sessions.map((s) => [s.id, s]));
+
+  // Group sets by session
+  const setsBySession = new Map();
+  for (const s of sets) {
+    if (!setsBySession.has(s.session_id)) setsBySession.set(s.session_id, []);
+    setsBySession.get(s.session_id).push(s);
+  }
+  for (const arr of setsBySession.values()) {
+    arr.sort((a, b) => (a.lift_id - b.lift_id) || (a.set_number - b.set_number));
+  }
+
+  // Working sets by lift, sorted oldest→newest
+  const workingByLift = new Map();
+  for (const s of sets) {
+    if (s.is_warmup) continue;
+    if (!workingByLift.has(s.lift_id)) workingByLift.set(s.lift_id, []);
+    workingByLift.get(s.lift_id).push(s);
+  }
+  for (const [, arr] of workingByLift) {
+    arr.sort((a, b) => {
+      const sa = sessionById.get(a.session_id);
+      const sb = sessionById.get(b.session_id);
+      if (sa.date !== sb.date) return sa.date.localeCompare(sb.date);
+      return a.set_number - b.set_number;
+    });
+  }
+
+  return { programById, liftById, sessionById, setsBySession, workingByLift };
+}
+
+// Resolve a display name to a lift row (handles aliases).
+function findLiftByDisplayName(displayName, lifts) {
+  const aliases = MAIN_LIFT_ALIASES[displayName] || [displayName];
+  for (const a of aliases) {
+    const hit = lifts.find((l) => l.name.toLowerCase() === a.toLowerCase());
+    if (hit) return hit;
+  }
+  return null;
+}
+
+// Group a session's sets by lift, in workout order (preserving lift_id order seen).
+function sessionLiftBlocks(sessionSets, liftById) {
+  const order = [];
+  const byLift = new Map();
+  for (const s of sessionSets) {
+    if (!byLift.has(s.lift_id)) {
+      byLift.set(s.lift_id, []);
+      order.push(s.lift_id);
+    }
+    byLift.get(s.lift_id).push(s);
+  }
+  return order.map((lid) => ({
+    lift: liftById.get(lid),
+    sets: byLift.get(lid).sort((a, b) => a.set_number - b.set_number),
+  }));
+}
+
+function workingSetsForLiftOnDate(allSetsOfLift, sessionId) {
+  return allSetsOfLift.filter((s) => s.session_id === sessionId && !s.is_warmup);
+}
+
+// "Successful" = every working set in that session hit target_reps.
+function wasSuccessful(workingSets) {
+  if (workingSets.length === 0) return null; // no data
+  return workingSets.every((s) => s.actual_reps != null && s.actual_reps >= s.target_reps);
+}
+
+// ----- Next workout calculation -----
+//
+// Logic:
+// 1. Find the most recent session. The next workout label alternates A/B
+//    (or whatever labels the program uses).
+// 2. For each main lift in the program, find the most recent session it
+//    appeared in. Apply progression based on success there:
+//      - all sets cleared → +increment
+//      - missed reps → repeat same weight (and count as a failure)
+//      - 3 consecutive failures (most recent 3 in a row) → deload by deload_percent
+function computeNext({ sessions, sets, programById, liftById, sessionById, setsBySession, workingByLift }, lifts) {
+  if (sessions.length === 0) return null;
+
+  const latest = sessions[0]; // sessions are sorted desc
+  const program = programById.get(latest.program_id);
+  if (!program) return { error: 'Most recent session has no linked program' };
+
+  // Determine next label by alternating from latest. We assume two labels A/B
+  // — common for StrongLifts. If program uses different labels, alternate
+  // between the two most recent distinct labels.
+  const recentLabels = [];
+  for (const s of sessions) {
+    if (!recentLabels.includes(s.workout_label)) recentLabels.push(s.workout_label);
+    if (recentLabels.length === 2) break;
+  }
+  const nextLabel = recentLabels.length >= 2
+    ? (latest.workout_label === recentLabels[0] ? recentLabels[1] : recentLabels[0])
+    : (latest.workout_label === 'A' ? 'B' : 'A');
+
+  // For each lift performed historically, decide which appears in the upcoming session.
+  // Heuristic: include a lift in nextLabel iff it has appeared in a session with that label
+  // in the past. (Avoids guessing program structure from name alone.)
+  const liftsInLabel = new Set();
+  for (const s of sessions) {
+    if (s.workout_label !== nextLabel) continue;
+    const ss = setsBySession.get(s.id) || [];
+    for (const set of ss) liftsInLabel.add(set.lift_id);
+  }
+
+  // If we have no history for that label yet, fall back to lifts seen in the latest session.
+  if (liftsInLabel.size === 0) {
+    const ss = setsBySession.get(latest.id) || [];
+    for (const set of ss) liftsInLabel.add(set.lift_id);
+  }
+
+  const nextLifts = [];
+  for (const liftId of liftsInLabel) {
+    const lift = liftById.get(liftId);
+    if (!lift) continue;
+    const result = progressionForLift(lift, program, sessions, setsBySession);
+    if (result) nextLifts.push(result);
+  }
+
+  // Sort: compounds first (squat, bench, row, ohp, deadlift order), then others.
+  const order = MAIN_LIFTS.flatMap((n) => MAIN_LIFT_ALIASES[n] || [n]).map((s) => s.toLowerCase());
+  nextLifts.sort((a, b) => {
+    const ai = order.indexOf(a.lift.name.toLowerCase());
+    const bi = order.indexOf(b.lift.name.toLowerCase());
+    const aOrd = ai === -1 ? 999 : ai;
+    const bOrd = bi === -1 ? 999 : bi;
+    if (aOrd !== bOrd) return aOrd - bOrd;
+    return a.lift.name.localeCompare(b.lift.name);
+  });
+
+  return {
+    label: nextLabel,
+    program,
+    lifts: nextLifts,
+    latestDate: latest.date,
+  };
+}
+
+function progressionForLift(lift, program, sessions, setsBySession) {
+  // Walk sessions newest→oldest, find ones containing this lift.
+  // Build a chronological history of (weight, success) events, oldest→newest.
+  const history = [];
+  // Iterate oldest→newest so streaks read naturally.
+  const asc = [...sessions].reverse();
+  for (const sess of asc) {
+    const sets = (setsBySession.get(sess.id) || []).filter((s) => s.lift_id === lift.id && !s.is_warmup);
+    if (sets.length === 0) continue;
+    const weight = sets[0].weight; // working sets share the prescribed weight
+    const success = wasSuccessful(sets);
+    history.push({ date: sess.date, weight, success, targetReps: sets[0].target_reps, sets });
+  }
+
+  if (history.length === 0) return null;
+
+  const last = history[history.length - 1];
+
+  // Pick increment. Default: program.progression_compound; if lift name is OHP/Press, use ohp.
+  const isOhpish = /press|ohp/i.test(lift.name) && !/bench/i.test(lift.name);
+  const inc = (isOhpish ? program.progression_ohp : program.progression_compound) ?? 5;
+  const deloadPct = program.deload_percent ?? 10;
+  const deloadThresh = program.deload_threshold ?? 3;
+
+  // Count consecutive failures at the *most recent* weight.
+  let failsAtCurrent = 0;
+  for (let i = history.length - 1; i >= 0; i--) {
+    if (history[i].weight !== last.weight) break;
+    if (history[i].success === false) failsAtCurrent++;
+    else if (history[i].success === true) break;
+  }
+
+  let nextWeight, reason;
+  if (failsAtCurrent >= deloadThresh) {
+    nextWeight = roundToLoadable(last.weight * (1 - deloadPct / 100));
+    reason = 'deload';
+  } else if (last.success === false) {
+    nextWeight = last.weight;
+    reason = 'repeat';
+  } else if (last.success === true) {
+    nextWeight = last.weight + inc;
+    reason = 'progress';
+  } else {
+    // No actual_reps recorded yet — treat as repeat.
+    nextWeight = last.weight;
+    reason = 'unknown';
+  }
+
+  // Sets/reps prescription — take from the most recent session for this lift.
+  const setCount = last.sets.length;
+  const reps = last.targetReps;
+
+  return {
+    lift,
+    weight: nextWeight,
+    sets: setCount,
+    reps,
+    reason,
+    delta: nextWeight - last.weight,
+    lastWeight: last.weight,
+  };
+}
+
+// Round target weight to nearest loadable increment given available plates.
+// Smallest plate is the smallest increment per side, so per-bar smallest = 2 * minPlate.
+function roundToLoadable(w) {
+  const minPlate = Math.min(...CONFIG.availablePlates);
+  const step = minPlate * 2;
+  const rel = w - CONFIG.barWeightLbs;
+  if (rel <= 0) return CONFIG.barWeightLbs;
+  return CONFIG.barWeightLbs + Math.round(rel / step) * step;
+}
+
+// ----- Renderers -----
+
+function renderNext(idx, lifts) {
+  const root = $('next');
+  root.classList.remove('loading');
+  root.innerHTML = '';
+
+  const next = computeNext(idx, lifts);
+  if (!next) {
+    root.appendChild(el('div', { class: 'empty' }, 'No sessions logged yet. Add one through Claude.'));
+    return;
+  }
+  if (next.error) {
+    root.appendChild(el('div', { class: 'error' }, next.error));
+    return;
+  }
+
+  const card = el('div', { class: 'next-card' });
+
+  card.appendChild(el('div', { class: 'header-row' },
+    el('div', { class: 'label' }, next.program?.name || 'Program', el('span', { class: 'badge' }, `Workout ${next.label}`)),
+    el('div', { class: 'label', style: 'font-family: var(--mono); font-variant-numeric: tabular-nums;' },
+      `last: ${fmtDateShort(next.latestDate)}`)
+  ));
+
+  if (next.lifts.length === 0) {
+    card.appendChild(el('div', { class: 'lift-row' },
+      el('div', { class: 'meta-line' }, 'No lifts found for this workout label yet.')));
+  }
+
+  for (const item of next.lifts) {
+    const deltaStr =
+      item.delta > 0 ? `+${fmtWeight(item.delta)}` :
+      item.delta < 0 ? `${fmtWeight(item.delta)} (deload)` :
+      '±0';
+    const deltaCls =
+      item.delta > 0 ? 'delta-up' :
+      item.delta < 0 ? 'delta-down' :
+      'delta-flat';
+
+    const ps = platesPerSide(item.weight);
+    const plateLine = item.weight < CONFIG.barWeightLbs
+      ? 'under bar weight'
+      : plateString(item.weight);
+
+    const metaChildren = [
+      el('span', null, `${item.sets}×${item.reps}`),
+      el('span', { class: deltaCls }, deltaStr),
+      el('span', { class: 'plates' }, plateLine),
+    ];
+    if (!ps.exact && item.weight >= CONFIG.barWeightLbs) {
+      // Already shown in plateString as "(+x short)" — no need for extra warn.
+    }
+
+    card.appendChild(el('div', { class: 'lift-row' },
+      el('div', { class: 'top' },
+        el('div', { class: 'name' }, item.lift.name),
+        el('div', { class: 'weight' }, fmtWeight(item.weight), el('span', { class: 'unit' }, 'lb'))
+      ),
+      el('div', { class: 'meta-line' }, ...metaChildren)
+    ));
+  }
+
+  root.appendChild(card);
+}
+
+function renderRecent(idx) {
+  const root = $('recent');
+  root.classList.remove('loading');
+  root.innerHTML = '';
+
+  const sessions = [...idx.sessionById.values()].sort((a, b) => {
+    if (a.date !== b.date) return b.date.localeCompare(a.date);
+    return b.id - a.id;
+  }).slice(0, 10);
+
+  if (sessions.length === 0) {
+    root.appendChild(el('div', { class: 'empty' }, 'No sessions yet.'));
+    return;
+  }
+
+  const list = el('div', { class: 'session-list' });
+  for (const s of sessions) {
+    const sessionSets = idx.setsBySession.get(s.id) || [];
+    const blocks = sessionLiftBlocks(sessionSets, idx.liftById);
+
+    // Compact summary line: "Squat 70 ✓ · Bench —"
+    const summaryItems = blocks.map((b) => {
+      const working = b.sets.filter((x) => !x.is_warmup);
+      if (working.length === 0) return null;
+      const success = wasSuccessful(working);
+      const weight = working[0].weight;
+      const cls = success === true ? 'ok' : success === false ? 'miss' : '';
+      const mark = success === true ? '✓' : success === false ? '✗' : '·';
+      const shortName = shortLiftName(b.lift?.name || '?');
+      return el('span', null, `${shortName} ${fmtWeight(weight)} `, el('span', { class: cls }, mark));
+    }).filter(Boolean);
+
+    const summaryLine = el('div', { class: 'lifts-summary' });
+    summaryItems.forEach((node, i) => {
+      if (i > 0) summaryLine.appendChild(document.createTextNode(' · '));
+      summaryLine.appendChild(node);
+    });
+
+    const sessionEl = el('div', { class: 'session', 'data-id': s.id });
+
+    const summary = el('div', { class: 'summary' },
+      el('span', { class: 'date' }, fmtDateShort(s.date)),
+      el('span', { class: 'label' }, s.workout_label || '?'),
+      summaryLine,
+      el('span', { class: 'chevron' }, '›')
+    );
+    summary.addEventListener('click', () => sessionEl.classList.toggle('expanded'));
+    sessionEl.appendChild(summary);
+
+    // Detail
+    const detail = el('div', { class: 'detail' });
+    for (const b of blocks) {
+      const working = b.sets.filter((x) => !x.is_warmup);
+      if (working.length === 0) continue;
+      const setPills = working.map((set) => {
+        const hit = set.actual_reps != null && set.actual_reps >= set.target_reps;
+        const cls = hit ? 'set-pill' : 'set-pill miss';
+        const repsText = set.actual_reps == null
+          ? `?/${set.target_reps}`
+          : `${set.actual_reps}/${set.target_reps}`;
+        return el('span', { class: cls }, `${fmtWeight(set.weight)}×${repsText}`);
+      });
+      detail.appendChild(el('div', { class: 'detail-lift' },
+        el('div', { class: 'name' }, b.lift?.name || 'Unknown'),
+        el('div', { class: 'sets' }, ...setPills)
+      ));
+    }
+    if (s.notes) {
+      detail.appendChild(el('div', { class: 'session-notes' }, s.notes));
+    }
+    sessionEl.appendChild(detail);
+
+    list.appendChild(sessionEl);
+  }
+  root.appendChild(list);
+}
+
+function shortLiftName(name) {
+  const map = {
+    'squat': 'Squat',
+    'back squat': 'Squat',
+    'bench press': 'Bench',
+    'bench': 'Bench',
+    'overhead press': 'OHP',
+    'standing press': 'OHP',
+    'press': 'OHP',
+    'ohp': 'OHP',
+    'barbell row': 'Row',
+    'pendlay row': 'Row',
+    'row': 'Row',
+    'deadlift': 'DL',
+    'conventional deadlift': 'DL',
+  };
+  return map[name.toLowerCase()] || name;
+}
+
+function renderCharts(idx, lifts) {
+  const root = $('charts');
+  root.classList.remove('loading');
+  root.innerHTML = '';
+
+  const grid = el('div', { class: 'charts' });
+  let rendered = 0;
+
+  for (const displayName of MAIN_LIFTS) {
+    const lift = findLiftByDisplayName(displayName, lifts);
+    if (!lift) continue;
+
+    // Per session: take top working set weight that day for this lift.
+    const working = idx.workingByLift.get(lift.id) || [];
+    if (working.length === 0) continue;
+
+    const byDate = new Map();
+    for (const s of working) {
+      const sess = idx.sessionById.get(s.session_id);
+      if (!sess) continue;
+      const cur = byDate.get(sess.date) || 0;
+      if (s.weight > cur) byDate.set(sess.date, s.weight);
+    }
+    if (byDate.size === 0) continue;
+
+    const points = [...byDate.entries()]
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([date, w]) => ({ x: parseDate(date), y: w }));
+
+    const card = el('div', { class: 'chart-card' });
+    card.appendChild(el('div', { class: 'head' },
+      el('div', { class: 'name' }, displayName),
+      el('div', { class: 'latest' }, `${fmtWeight(points[points.length - 1].y)} lb`)
+    ));
+    const canvas = el('canvas');
+    card.appendChild(canvas);
+    grid.appendChild(card);
+
+    // Render after attached so size is correct.
+    queueMicrotask(() => {
+      new Chart(canvas, {
+        type: 'line',
+        data: {
+          datasets: [{
+            data: points,
+            borderColor: '#d97757',
+            backgroundColor: 'rgba(217, 119, 87, 0.12)',
+            borderWidth: 2,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            pointBackgroundColor: '#d97757',
+            pointBorderColor: '#0a0a0a',
+            pointBorderWidth: 1,
+            tension: 0.2,
+            fill: true,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 250 },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#161616',
+              titleColor: '#f4f4f5',
+              bodyColor: '#a1a1aa',
+              borderColor: '#232323',
+              borderWidth: 1,
+              padding: 8,
+              displayColors: false,
+              callbacks: {
+                title: (items) => items[0].parsed.x ? new Date(items[0].parsed.x).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+                label: (item) => `${fmtWeight(item.parsed.y)} lb`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: { unit: points.length > 30 ? 'month' : 'week', displayFormats: { week: 'MMM d', month: 'MMM' } },
+              grid: { color: '#1c1c1c' },
+              border: { color: '#232323' },
+              ticks: { color: '#71717a', font: { size: 10 }, maxRotation: 0, autoSkipPadding: 14 },
+            },
+            y: {
+              grid: { color: '#1c1c1c' },
+              border: { color: '#232323' },
+              ticks: { color: '#71717a', font: { size: 10 }, callback: (v) => `${v}` },
+            },
+          },
+        },
+      });
+    });
+    rendered++;
+  }
+
+  if (rendered === 0) {
+    root.appendChild(el('div', { class: 'empty' }, 'No working sets logged for any main lift yet.'));
+  } else {
+    root.appendChild(grid);
+  }
+}
+
+function renderStats(idx) {
+  const root = $('stats');
+  root.classList.remove('loading');
+  root.innerHTML = '';
+
+  const sessions = [...idx.sessionById.values()];
+  const totalSessions = sessions.length;
+
+  let totalVolume = 0;
+  for (const [, sets] of idx.setsBySession) {
+    for (const s of sets) {
+      if (s.is_warmup) continue;
+      const reps = s.actual_reps != null ? s.actual_reps : 0;
+      totalVolume += (s.weight || 0) * reps;
+    }
+  }
+
+  let daysSince = null;
+  if (sessions.length > 0) {
+    const newest = sessions.reduce((a, b) => (a.date > b.date ? a : b));
+    daysSince = daysBetween(parseDate(newest.date), today());
+  }
+
+  const streak = computeStreak(sessions);
+
+  const grid = el('div', { class: 'stats' });
+  grid.appendChild(stat(fmtInt(totalSessions), 'Sessions'));
+  grid.appendChild(stat(fmtInt(totalVolume), 'Volume (lb)'));
+  grid.appendChild(stat(daysSince == null ? '—' : String(daysSince), daysSince === 1 ? 'Day since last' : 'Days since last'));
+  grid.appendChild(stat(String(streak), streak === 1 ? 'Week streak' : 'Week streak'));
+  root.appendChild(grid);
+}
+
+function stat(value, label) {
+  return el('div', { class: 'stat' },
+    el('div', { class: 'v' }, value),
+    el('div', { class: 'k' }, label));
+}
+
+// Streak: consecutive ISO weeks (Mon-anchored) with ≥3 sessions, ending at most-recent week.
+function computeStreak(sessions) {
+  if (sessions.length === 0) return 0;
+  const counts = new Map();
+  for (const s of sessions) {
+    const key = isoWeekKey(parseDate(s.date));
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  // Walk backwards from current week.
+  const now = today();
+  let streak = 0;
+  // If current week doesn't have ≥3, try last week as the streak anchor (you might not have lifted yet today).
+  let cursor = new Date(now);
+  let allowedMissCurrent = true;
+  while (true) {
+    const key = isoWeekKey(cursor);
+    const c = counts.get(key) || 0;
+    if (c >= 3) {
+      streak++;
+    } else if (allowedMissCurrent && streak === 0) {
+      // current (incomplete) week — skip without breaking
+      allowedMissCurrent = false;
+    } else {
+      break;
+    }
+    cursor.setDate(cursor.getDate() - 7);
+    // Stop if we go before the earliest session
+    if (counts.size === 0) break;
+  }
+  return streak;
+}
+
+function isoWeekKey(d) {
+  // Mon=1..Sun=7. Get Monday of this week.
+  const day = d.getDay() || 7;
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - day + 1);
+  monday.setHours(0, 0, 0, 0);
+  return `${monday.getFullYear()}-${monday.getMonth()}-${monday.getDate()}`;
+}
+
+// ----- Boot -----
+async function boot() {
+  try {
+    const data = await fetchAll();
+    const idx = indexData(data);
+
+    // Header meta
+    const newest = data.sessions[0];
+    const headerMeta = newest ? `${data.sessions.length} sessions · last ${fmtDateShort(newest.date)}` : 'no data';
+    $('header-meta').textContent = headerMeta;
+
+    renderNext(idx, data.lifts);
+    renderRecent(idx);
+    renderCharts(idx, data.lifts);
+    renderStats(idx);
+  } catch (err) {
+    console.error(err);
+    const msg = err && err.message ? err.message : String(err);
+    for (const id of ['next', 'recent', 'charts', 'stats']) {
+      const e = $(id);
+      e.classList.remove('loading');
+      e.innerHTML = '';
+      e.appendChild(el('div', { class: 'error' }, msg));
+    }
+  }
+}
+
+boot();
+</script>
+</body>
+</html>
