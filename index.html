@@ -84,6 +84,13 @@
     color: var(--text-faint);
     margin: 0 0 14px 0;
   }
+  section > h2 .h2-sub {
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    color: var(--text-faint);
+    margin-left: 2px;
+  }
 
   /* Loading */
   .loading {
@@ -123,38 +130,8 @@
   }
 
   /* Up Next */
-  .next-card {
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--bg-elev);
-    overflow: hidden;
-  }
-
-  .next-card .header-row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  .next-card .label {
-    font-size: 12px;
-    color: var(--text-faint);
-  }
-  .next-card .badge {
-    display: inline-block;
-    background: var(--accent-dim);
-    color: var(--accent);
-    font-weight: 600;
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    padding: 3px 8px;
-    border-radius: 4px;
-    margin-left: 8px;
-  }
-
   .lift-row {
-    padding: 14px 16px;
+    padding: 10px 16px;
     border-bottom: 1px solid var(--border);
   }
   .lift-row:last-child { border-bottom: none; }
@@ -163,7 +140,7 @@
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    margin-bottom: 6px;
+    margin-bottom: 2px;
   }
   .lift-row .name {
     font-weight: 600;
@@ -182,22 +159,24 @@
     font-weight: 400;
     margin-left: 3px;
   }
-  .lift-row .meta-line {
-    display: flex;
-    gap: 14px;
-    font-size: 12px;
+  .lift-row .sets-line {
+    font-size: 13px;
     color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .lift-row .sets-line .delta-up { color: var(--good); margin-left: 8px; }
+  .lift-row .sets-line .delta-down { color: var(--bad); margin-left: 8px; }
+  .lift-row .sets-line .delta-flat { color: var(--text-faint); margin-left: 8px; }
+  .lift-row .plates-line {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--text-faint);
     font-family: var(--mono);
     font-variant-numeric: tabular-nums;
   }
-  .lift-row .meta-line .plates {
+  .lift-row .plates-line .lbl {
     color: var(--text-faint);
-  }
-  .lift-row .meta-line .delta-up { color: var(--good); }
-  .lift-row .meta-line .delta-down { color: var(--bad); }
-  .lift-row .meta-line .delta-flat { color: var(--text-faint); }
-  .lift-row .meta-line .warn {
-    color: #fbbf24;
+    margin-right: 6px;
   }
 
   /* Recent sessions */
@@ -311,6 +290,46 @@
     font-style: italic;
   }
 
+  /* Upcoming session — visually distinct, expanded by default */
+  .session.next {
+    border-color: var(--accent);
+  }
+  .session.next .badge-next {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    font-family: var(--font);
+    min-width: 0;
+    width: auto;
+    height: auto;
+    line-height: 1.2;
+    text-align: left;
+    border: none;
+  }
+  .session.next .lifts-summary {
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--text);
+  }
+  .session.next .lifts-summary .sub {
+    color: var(--text-faint);
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  /* The next-detail uses lift-row layout, which has its own horizontal padding,
+     so zero out the outer .detail padding to avoid doubled gutters. */
+  .session.next > .detail.next-detail {
+    padding: 0;
+    background: var(--bg-elev);
+    border-top: 1px solid var(--border);
+  }
+
   /* Charts */
   .charts {
     display: grid;
@@ -347,37 +366,6 @@
     height: 130px !important;
   }
 
-  /* Stats */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-  @media (min-width: 600px) {
-    .stats { grid-template-columns: repeat(4, 1fr); }
-  }
-  .stat {
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--bg-elev);
-    padding: 14px;
-  }
-  .stat .v {
-    font-family: var(--mono);
-    font-size: 24px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    font-variant-numeric: tabular-nums;
-    line-height: 1.1;
-  }
-  .stat .k {
-    font-size: 11px;
-    color: var(--text-faint);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-top: 6px;
-  }
-
   footer {
     margin-top: 48px;
     padding-top: 16px;
@@ -396,24 +384,14 @@
   <div class="meta" id="header-meta">—</div>
 </header>
 
-<section id="next-section">
-  <h2>Up Next</h2>
-  <div id="next" class="loading"><div class="spinner"></div> Loading…</div>
-</section>
-
-<section id="recent-section">
-  <h2>Recent Sessions</h2>
-  <div id="recent" class="loading"><div class="spinner"></div> Loading…</div>
+<section id="sessions-section">
+  <h2>Sessions</h2>
+  <div id="sessions" class="loading"><div class="spinner"></div> Loading…</div>
 </section>
 
 <section id="charts-section">
-  <h2>Progression</h2>
+  <h2>Progression <span class="h2-sub">— last 30 days</span></h2>
   <div id="charts" class="loading"><div class="spinner"></div> Loading…</div>
-</section>
-
-<section id="stats-section">
-  <h2>Stats</h2>
-  <div id="stats" class="loading"><div class="spinner"></div> Loading…</div>
 </section>
 
 <footer>read-only · writes via Claude</footer>
@@ -421,6 +399,8 @@
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 import Chart from 'https://esm.sh/chart.js@4.4.6/auto';
+// Chart.js v4 ships without a date adapter; this registers date-fns for the time scale.
+import 'https://esm.sh/chartjs-adapter-date-fns@3.0.0?deps=chart.js@4.4.6';
 
 // ----- Config -----
 const CONFIG = {
@@ -447,9 +427,9 @@ const supa = createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey, {
 
 // ----- Tiny DOM helpers -----
 const $ = (id) => document.getElementById(id);
-const el = (tag, attrs = {}, ...children) => {
+const el = (tag, attrs, ...children) => {
   const e = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs)) {
+  for (const [k, v] of Object.entries(attrs || {})) {
     if (k === 'class') e.className = v;
     else if (k === 'style') e.setAttribute('style', v);
     else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
@@ -480,6 +460,37 @@ const fmtDateShort = (s) => {
 const today = () => new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
 const daysBetween = (a, b) => Math.round((b - a) / 86400000);
 
+// Convert JS getDay() (Sun=0..Sat=6) to ISO weekday (Mon=1..Sun=7).
+const isoWeekday = (d) => ((d.getDay() + 6) % 7) + 1;
+
+// Pick the next session date given:
+//   - latestDateStr: when the user last lifted ('YYYY-MM-DD' or null)
+//   - scheduleDays:  ISO weekdays the program runs (e.g. [1, 3, 5] = M/W/F)
+//
+// Rule: starting from today (or tomorrow if user already lifted today),
+// scan forward up to 7 days for the next day whose ISO weekday is in scheduleDays.
+function nextSessionDate(latestDateStr, scheduleDays) {
+  const days = (scheduleDays && scheduleDays.length) ? scheduleDays : [1, 2, 3, 4, 5, 6, 7];
+  const now = today();
+  const liftedToday = latestDateStr && daysBetween(parseDate(latestDateStr), now) === 0;
+  const start = new Date(now);
+  if (liftedToday) start.setDate(start.getDate() + 1);
+  for (let i = 0; i < 7; i++) {
+    const candidate = new Date(start);
+    candidate.setDate(start.getDate() + i);
+    if (days.includes(isoWeekday(candidate))) return candidate;
+  }
+  return start; // fallback — shouldn't happen with a non-empty schedule
+}
+
+function nextSessionLabel(latestDateStr, scheduleDays) {
+  const target = nextSessionDate(latestDateStr, scheduleDays);
+  const diff = daysBetween(today(), target);
+  if (diff === 0) return 'TODAY';
+  if (diff === 1) return 'TOMORROW';
+  return target.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+}
+
 // ----- Plate math -----
 // Returns { plates: [25, 10, 2.5, ...], remainder, exact: bool }
 function platesPerSide(targetWeight, bar = CONFIG.barWeightLbs, plates = CONFIG.availablePlates) {
@@ -500,29 +511,31 @@ function platesPerSide(targetWeight, bar = CONFIG.barWeightLbs, plates = CONFIG.
 
 function plateString(targetWeight) {
   const { plates, remainder, exact } = platesPerSide(targetWeight);
-  if (targetWeight < CONFIG.barWeightLbs) return 'bar only (under bar weight)';
-  if (plates.length === 0 && targetWeight === CONFIG.barWeightLbs) return 'bar only';
-  // Group identical plates: e.g. [25, 10, 2.5] -> "1×25, 1×10, 1×2.5"
+  if (targetWeight < CONFIG.barWeightLbs) return 'bar only (target is below bar weight)';
+  if (plates.length === 0 && targetWeight === CONFIG.barWeightLbs) return 'just the bar (45 lb)';
+  // Group identical plates and write them as plain English.
+  // [25, 10, 2.5] -> "25 + 10 + 2.5"; [45, 45] -> "two 45s"
   const counts = new Map();
   for (const p of plates) counts.set(p, (counts.get(p) || 0) + 1);
   const parts = [...counts.entries()]
     .sort((a, b) => b[0] - a[0])
-    .map(([w, c]) => `${c}×${fmtWeight(w)}`);
+    .map(([w, c]) => (c === 1 ? `${fmtWeight(w)}` : `${c}× ${fmtWeight(w)}`));
   let s = parts.join(' + ');
-  if (!exact) s += ` (+${fmtWeight(remainder)} short)`;
-  return s + ' /side';
+  if (!exact) s += ` (${fmtWeight(remainder)} lb short — closest loadable)`;
+  return s;
 }
 
 // ----- Data fetch -----
 async function fetchAll() {
-  // Fetch in parallel. Programs/lifts are tiny lookup tables.
-  const [programsRes, liftsRes, sessionsRes, setsRes] = await Promise.all([
+  // Fetch in parallel. Programs/lifts/program_workouts are tiny lookup tables.
+  const [programsRes, liftsRes, sessionsRes, setsRes, programWorkoutsRes] = await Promise.all([
     supa.from('programs').select('*'),
     supa.from('lifts').select('*'),
     supa.from('sessions').select('*').order('date', { ascending: false }).order('id', { ascending: false }),
     supa.from('sets').select('*'),
+    supa.from('program_workouts').select('*').order('program_id').order('label').order('position'),
   ]);
-  for (const r of [programsRes, liftsRes, sessionsRes, setsRes]) {
+  for (const r of [programsRes, liftsRes, sessionsRes, setsRes, programWorkoutsRes]) {
     if (r.error) throw new Error(r.error.message);
   }
   return {
@@ -530,14 +543,29 @@ async function fetchAll() {
     lifts: liftsRes.data ?? [],
     sessions: sessionsRes.data ?? [],
     sets: setsRes.data ?? [],
+    programWorkouts: programWorkoutsRes.data ?? [],
   };
 }
 
 // ----- Indexing -----
-function indexData({ programs, lifts, sessions, sets }) {
+function indexData({ programs, lifts, sessions, sets, programWorkouts }) {
   const programById = new Map(programs.map((p) => [p.id, p]));
   const liftById = new Map(lifts.map((l) => [l.id, l]));
   const sessionById = new Map(sessions.map((s) => [s.id, s]));
+
+  // program_workouts grouped: programWorkoutsByProgramLabel.get(programId).get('A') = [{lift_id, set_count, target_reps, position}, ...]
+  const programWorkoutsByProgramLabel = new Map();
+  for (const pw of (programWorkouts ?? [])) {
+    if (!programWorkoutsByProgramLabel.has(pw.program_id)) {
+      programWorkoutsByProgramLabel.set(pw.program_id, new Map());
+    }
+    const byLabel = programWorkoutsByProgramLabel.get(pw.program_id);
+    if (!byLabel.has(pw.label)) byLabel.set(pw.label, []);
+    byLabel.get(pw.label).push(pw);
+  }
+  for (const byLabel of programWorkoutsByProgramLabel.values()) {
+    for (const arr of byLabel.values()) arr.sort((a, b) => a.position - b.position);
+  }
 
   // Group sets by session
   const setsBySession = new Map();
@@ -565,7 +593,12 @@ function indexData({ programs, lifts, sessions, sets }) {
     });
   }
 
-  return { sessions, sets, programById, liftById, sessionById, setsBySession, workingByLift };
+  return {
+    sessions, sets,
+    programById, liftById, sessionById,
+    setsBySession, workingByLift,
+    programWorkoutsByProgramLabel,
+  };
 }
 
 // Resolve a display name to a lift row (handles aliases).
@@ -607,98 +640,95 @@ function wasSuccessful(workingSets) {
 
 // ----- Next workout calculation -----
 //
-// Logic:
-// 1. Find the most recent session. The next workout label alternates A/B
-//    (or whatever labels the program uses).
-// 2. For each main lift in the program, find the most recent session it
-//    appeared in. Apply progression based on success there:
-//      - all sets cleared → +increment
-//      - missed reps → repeat same weight (and count as a failure)
-//      - 3 consecutive failures (most recent 3 in a row) → deload by deload_percent
-function computeNext({ sessions, sets, programById, liftById, sessionById, setsBySession, workingByLift }, lifts) {
-  if (sessions.length === 0) return null;
+// Sources of truth (post-migration):
+//   - program_workouts: which lifts/sets/reps make up each label, in order
+//   - programs.schedule_days: ISO weekdays the program runs
+//   - sessions/sets: history used only for progression (weight) and alternation
+//
+// Alternation rule: the next label is whichever label wasn't run last. If
+// there's no history yet, we fall back to the lowest label by sort order.
+function computeNext(idx) {
+  const { programById, liftById, sessions, setsBySession, programWorkoutsByProgramLabel } = idx;
 
-  const latest = sessions[0]; // sessions are sorted desc
-  const program = programById.get(latest.program_id);
-  if (!program) return { error: 'Most recent session has no linked program' };
-
-  // Determine next label by alternating from latest. We assume two labels A/B
-  // — common for StrongLifts. If program uses different labels, alternate
-  // between the two most recent distinct labels.
-  const recentLabels = [];
-  for (const s of sessions) {
-    if (!recentLabels.includes(s.workout_label)) recentLabels.push(s.workout_label);
-    if (recentLabels.length === 2) break;
+  // Pick the program: use the most recent session's program if any, else the
+  // first (and currently only) program in the table.
+  const latest = sessions[0] ?? null;
+  let program = latest ? programById.get(latest.program_id) : null;
+  if (!program) {
+    const all = [...programById.values()];
+    program = all[0] ?? null;
   }
-  const nextLabel = recentLabels.length >= 2
-    ? (latest.workout_label === recentLabels[0] ? recentLabels[1] : recentLabels[0])
-    : (latest.workout_label === 'A' ? 'B' : 'A');
+  if (!program) return null;
 
-  // For each lift performed historically, decide which appears in the upcoming session.
-  // Heuristic: include a lift in nextLabel iff it has appeared in a session with that label
-  // in the past. (Avoids guessing program structure from name alone.)
-  const liftsInLabel = new Set();
-  for (const s of sessions) {
-    if (s.workout_label !== nextLabel) continue;
-    const ss = setsBySession.get(s.id) || [];
-    for (const set of ss) liftsInLabel.add(set.lift_id);
+  const byLabel = programWorkoutsByProgramLabel.get(program.id);
+  if (!byLabel || byLabel.size === 0) {
+    return { error: `Program "${program.name}" has no workouts defined.` };
   }
 
-  // If we have no history for that label yet, fall back to lifts seen in the latest session.
-  if (liftsInLabel.size === 0) {
-    const ss = setsBySession.get(latest.id) || [];
-    for (const set of ss) liftsInLabel.add(set.lift_id);
+  // Available labels in deterministic order — the program's structure is the
+  // source of truth, not history.
+  const labels = [...byLabel.keys()].sort();
+
+  // Pick next label: alternate from the latest session, or default to first.
+  let nextLabel;
+  if (latest && labels.includes(latest.workout_label)) {
+    const idxLabel = labels.indexOf(latest.workout_label);
+    nextLabel = labels[(idxLabel + 1) % labels.length];
+  } else {
+    nextLabel = labels[0];
   }
 
+  const slots = byLabel.get(nextLabel) ?? [];
   const nextLifts = [];
-  for (const liftId of liftsInLabel) {
-    const lift = liftById.get(liftId);
+  for (const slot of slots) {
+    const lift = liftById.get(slot.lift_id);
     if (!lift) continue;
-    const result = progressionForLift(lift, program, sessions, setsBySession);
-    if (result) nextLifts.push(result);
+    nextLifts.push(progressionForSlot(lift, slot, program, sessions, setsBySession));
   }
-
-  // Sort: compounds first (squat, bench, row, ohp, deadlift order), then others.
-  const order = MAIN_LIFTS.flatMap((n) => MAIN_LIFT_ALIASES[n] || [n]).map((s) => s.toLowerCase());
-  nextLifts.sort((a, b) => {
-    const ai = order.indexOf(a.lift.name.toLowerCase());
-    const bi = order.indexOf(b.lift.name.toLowerCase());
-    const aOrd = ai === -1 ? 999 : ai;
-    const bOrd = bi === -1 ? 999 : bi;
-    if (aOrd !== bOrd) return aOrd - bOrd;
-    return a.lift.name.localeCompare(b.lift.name);
-  });
 
   return {
     label: nextLabel,
     program,
     lifts: nextLifts,
-    latestDate: latest.date,
+    latestDate: latest?.date ?? null,
   };
 }
 
-function progressionForLift(lift, program, sessions, setsBySession) {
+// Sets/reps come from the program slot. Weight is computed from history.
+// If no history exists for this lift yet, we fall back to bar weight as the
+// starting point — better than guessing.
+function progressionForSlot(lift, slot, program, sessions, setsBySession) {
   // Walk sessions newest→oldest, find ones containing this lift.
   // Build a chronological history of (weight, success) events, oldest→newest.
   const history = [];
-  // Iterate oldest→newest so streaks read naturally.
   const asc = [...sessions].reverse();
   for (const sess of asc) {
     const sets = (setsBySession.get(sess.id) || []).filter((s) => s.lift_id === lift.id && !s.is_warmup);
     if (sets.length === 0) continue;
     const weight = sets[0].weight; // working sets share the prescribed weight
     const success = wasSuccessful(sets);
-    history.push({ date: sess.date, weight, success, targetReps: sets[0].target_reps, sets });
+    history.push({ date: sess.date, weight, success });
   }
 
-  if (history.length === 0) return null;
+  // No prior history → start fresh at bar weight.
+  if (history.length === 0) {
+    return {
+      lift,
+      weight: CONFIG.barWeightLbs,
+      sets: slot.set_count,
+      reps: slot.target_reps,
+      reason: 'starting',
+      delta: 0,
+      lastWeight: null,
+    };
+  }
 
   const last = history[history.length - 1];
 
-  // Pick increment. Default: program.progression_compound; if lift name is OHP/Press, use ohp.
+  // Pick increment. Default: program.progression_compound; OHP/Press use the smaller increment.
   const isOhpish = /press|ohp/i.test(lift.name) && !/bench/i.test(lift.name);
-  const inc = (isOhpish ? program.progression_ohp : program.progression_compound) ?? 5;
-  const deloadPct = program.deload_percent ?? 10;
+  const inc = Number(isOhpish ? program.progression_ohp : program.progression_compound) || 5;
+  const deloadPct = Number(program.deload_percent) || 10;
   const deloadThresh = program.deload_threshold ?? 3;
 
   // Count consecutive failures at the *most recent* weight.
@@ -711,32 +741,27 @@ function progressionForLift(lift, program, sessions, setsBySession) {
 
   let nextWeight, reason;
   if (failsAtCurrent >= deloadThresh) {
-    nextWeight = roundToLoadable(last.weight * (1 - deloadPct / 100));
+    nextWeight = roundToLoadable(Number(last.weight) * (1 - deloadPct / 100));
     reason = 'deload';
   } else if (last.success === false) {
-    nextWeight = last.weight;
+    nextWeight = Number(last.weight);
     reason = 'repeat';
   } else if (last.success === true) {
-    nextWeight = last.weight + inc;
+    nextWeight = Number(last.weight) + inc;
     reason = 'progress';
   } else {
-    // No actual_reps recorded yet — treat as repeat.
-    nextWeight = last.weight;
+    nextWeight = Number(last.weight);
     reason = 'unknown';
   }
-
-  // Sets/reps prescription — take from the most recent session for this lift.
-  const setCount = last.sets.length;
-  const reps = last.targetReps;
 
   return {
     lift,
     weight: nextWeight,
-    sets: setCount,
-    reps,
+    sets: slot.set_count,
+    reps: slot.target_reps,
     reason,
-    delta: nextWeight - last.weight,
-    lastWeight: last.weight,
+    delta: nextWeight - Number(last.weight),
+    lastWeight: Number(last.weight),
   };
 }
 
@@ -752,145 +777,146 @@ function roundToLoadable(w) {
 
 // ----- Renderers -----
 
-function renderNext(idx, lifts) {
-  const root = $('next');
+function renderSessions(idx) {
+  const root = $('sessions');
   root.classList.remove('loading');
   root.innerHTML = '';
 
-  const next = computeNext(idx, lifts);
-  if (!next) {
+  const list = el('div', { class: 'session-list' });
+
+  // Upcoming session, expanded by default.
+  const next = computeNext(idx);
+  if (next && !next.error) {
+    list.appendChild(buildNextCard(next));
+  } else if (next?.error) {
+    list.appendChild(el('div', { class: 'error' }, next.error));
+  }
+
+  // Past sessions, newest first, collapsed.
+  const past = [...idx.sessionById.values()].sort((a, b) => {
+    if (a.date !== b.date) return b.date.localeCompare(a.date);
+    return b.id - a.id;
+  }).slice(0, 10);
+
+  if (past.length === 0 && !next) {
     root.appendChild(el('div', { class: 'empty' }, 'No sessions logged yet. Add one through Claude.'));
     return;
   }
-  if (next.error) {
-    root.appendChild(el('div', { class: 'error' }, next.error));
-    return;
-  }
 
-  const card = el('div', { class: 'next-card' });
+  for (const s of past) list.appendChild(buildPastCard(s, idx));
 
-  card.appendChild(el('div', { class: 'header-row' },
-    el('div', { class: 'label' }, next.program?.name || 'Program', el('span', { class: 'badge' }, `Workout ${next.label}`)),
-    el('div', { class: 'label', style: 'font-family: var(--mono); font-variant-numeric: tabular-nums;' },
-      `last: ${fmtDateShort(next.latestDate)}`)
-  ));
+  root.appendChild(list);
+}
+
+function buildNextCard(next) {
+  const sessionEl = el('div', { class: 'session next expanded' });
+
+  const summary = el('div', { class: 'summary' },
+    el('span', { class: 'badge-next' }, nextSessionLabel(next.latestDate, next.program?.schedule_days)),
+    el('span', { class: 'label' }, next.label),
+    el('span', { class: 'lifts-summary' }, next.program?.name || 'Program'),
+    el('span', { class: 'chevron' }, '›')
+  );
+  summary.addEventListener('click', () => sessionEl.classList.toggle('expanded'));
+  sessionEl.appendChild(summary);
+
+  const detail = el('div', { class: 'detail next-detail' });
 
   if (next.lifts.length === 0) {
-    card.appendChild(el('div', { class: 'lift-row' },
-      el('div', { class: 'meta-line' }, 'No lifts found for this workout label yet.')));
+    detail.appendChild(el('div', { class: 'empty' }, 'No lifts found for this workout label yet.'));
   }
 
   for (const item of next.lifts) {
     const deltaStr =
-      item.delta > 0 ? `+${fmtWeight(item.delta)}` :
-      item.delta < 0 ? `${fmtWeight(item.delta)} (deload)` :
-      '±0';
+      item.delta > 0 ? `+${fmtWeight(item.delta)} lb` :
+      item.delta < 0 ? `${fmtWeight(item.delta)} lb (deload)` :
+      'same as last';
     const deltaCls =
       item.delta > 0 ? 'delta-up' :
       item.delta < 0 ? 'delta-down' :
       'delta-flat';
 
-    const ps = platesPerSide(item.weight);
-    const plateLine = item.weight < CONFIG.barWeightLbs
-      ? 'under bar weight'
+    const setsText = `${item.sets} ${item.sets === 1 ? 'set' : 'sets'} × ${item.reps} reps`;
+    const platesText = item.weight < CONFIG.barWeightLbs
+      ? 'target is below bar weight'
       : plateString(item.weight);
 
-    const metaChildren = [
-      el('span', null, `${item.sets}×${item.reps}`),
-      el('span', { class: deltaCls }, deltaStr),
-      el('span', { class: 'plates' }, plateLine),
-    ];
-    if (!ps.exact && item.weight >= CONFIG.barWeightLbs) {
-      // Already shown in plateString as "(+x short)" — no need for extra warn.
-    }
-
-    card.appendChild(el('div', { class: 'lift-row' },
+    detail.appendChild(el('div', { class: 'lift-row' },
       el('div', { class: 'top' },
         el('div', { class: 'name' }, item.lift.name),
         el('div', { class: 'weight' }, fmtWeight(item.weight), el('span', { class: 'unit' }, 'lb'))
       ),
-      el('div', { class: 'meta-line' }, ...metaChildren)
+      el('div', { class: 'sets-line' },
+        setsText,
+        el('span', { class: deltaCls }, deltaStr),
+      ),
+      el('div', { class: 'plates-line' },
+        el('span', { class: 'lbl' }, 'Plates per side:'),
+        platesText,
+      )
     ));
   }
 
-  root.appendChild(card);
+  sessionEl.appendChild(detail);
+  return sessionEl;
 }
 
-function renderRecent(idx) {
-  const root = $('recent');
-  root.classList.remove('loading');
-  root.innerHTML = '';
+function buildPastCard(s, idx) {
+  const sessionSets = idx.setsBySession.get(s.id) || [];
+  const blocks = sessionLiftBlocks(sessionSets, idx.liftById);
 
-  const sessions = [...idx.sessionById.values()].sort((a, b) => {
-    if (a.date !== b.date) return b.date.localeCompare(a.date);
-    return b.id - a.id;
-  }).slice(0, 10);
+  // Compact summary line: "Squat 70 ✓ · Bench —"
+  const summaryItems = blocks.map((b) => {
+    const working = b.sets.filter((x) => !x.is_warmup);
+    if (working.length === 0) return null;
+    const success = wasSuccessful(working);
+    const weight = working[0].weight;
+    const cls = success === true ? 'ok' : success === false ? 'miss' : '';
+    const mark = success === true ? '✓' : success === false ? '✗' : '·';
+    const shortName = shortLiftName(b.lift?.name || '?');
+    return el('span', null, `${shortName} ${fmtWeight(weight)} `, el('span', { class: cls }, mark));
+  }).filter(Boolean);
 
-  if (sessions.length === 0) {
-    root.appendChild(el('div', { class: 'empty' }, 'No sessions yet.'));
-    return;
-  }
+  const summaryLine = el('div', { class: 'lifts-summary' });
+  summaryItems.forEach((node, i) => {
+    if (i > 0) summaryLine.appendChild(document.createTextNode(' · '));
+    summaryLine.appendChild(node);
+  });
 
-  const list = el('div', { class: 'session-list' });
-  for (const s of sessions) {
-    const sessionSets = idx.setsBySession.get(s.id) || [];
-    const blocks = sessionLiftBlocks(sessionSets, idx.liftById);
+  const sessionEl = el('div', { class: 'session', 'data-id': s.id });
 
-    // Compact summary line: "Squat 70 ✓ · Bench —"
-    const summaryItems = blocks.map((b) => {
-      const working = b.sets.filter((x) => !x.is_warmup);
-      if (working.length === 0) return null;
-      const success = wasSuccessful(working);
-      const weight = working[0].weight;
-      const cls = success === true ? 'ok' : success === false ? 'miss' : '';
-      const mark = success === true ? '✓' : success === false ? '✗' : '·';
-      const shortName = shortLiftName(b.lift?.name || '?');
-      return el('span', null, `${shortName} ${fmtWeight(weight)} `, el('span', { class: cls }, mark));
-    }).filter(Boolean);
+  const summary = el('div', { class: 'summary' },
+    el('span', { class: 'date' }, fmtDateShort(s.date)),
+    el('span', { class: 'label' }, s.workout_label || '?'),
+    summaryLine,
+    el('span', { class: 'chevron' }, '›')
+  );
+  summary.addEventListener('click', () => sessionEl.classList.toggle('expanded'));
+  sessionEl.appendChild(summary);
 
-    const summaryLine = el('div', { class: 'lifts-summary' });
-    summaryItems.forEach((node, i) => {
-      if (i > 0) summaryLine.appendChild(document.createTextNode(' · '));
-      summaryLine.appendChild(node);
+  const detail = el('div', { class: 'detail' });
+  for (const b of blocks) {
+    const working = b.sets.filter((x) => !x.is_warmup);
+    if (working.length === 0) continue;
+    const setPills = working.map((set) => {
+      const hit = set.actual_reps != null && set.actual_reps >= set.target_reps;
+      const cls = hit ? 'set-pill' : 'set-pill miss';
+      const repsText = set.actual_reps == null
+        ? `?/${set.target_reps}`
+        : `${set.actual_reps}/${set.target_reps}`;
+      return el('span', { class: cls }, `${fmtWeight(set.weight)}×${repsText}`);
     });
-
-    const sessionEl = el('div', { class: 'session', 'data-id': s.id });
-
-    const summary = el('div', { class: 'summary' },
-      el('span', { class: 'date' }, fmtDateShort(s.date)),
-      el('span', { class: 'label' }, s.workout_label || '?'),
-      summaryLine,
-      el('span', { class: 'chevron' }, '›')
-    );
-    summary.addEventListener('click', () => sessionEl.classList.toggle('expanded'));
-    sessionEl.appendChild(summary);
-
-    // Detail
-    const detail = el('div', { class: 'detail' });
-    for (const b of blocks) {
-      const working = b.sets.filter((x) => !x.is_warmup);
-      if (working.length === 0) continue;
-      const setPills = working.map((set) => {
-        const hit = set.actual_reps != null && set.actual_reps >= set.target_reps;
-        const cls = hit ? 'set-pill' : 'set-pill miss';
-        const repsText = set.actual_reps == null
-          ? `?/${set.target_reps}`
-          : `${set.actual_reps}/${set.target_reps}`;
-        return el('span', { class: cls }, `${fmtWeight(set.weight)}×${repsText}`);
-      });
-      detail.appendChild(el('div', { class: 'detail-lift' },
-        el('div', { class: 'name' }, b.lift?.name || 'Unknown'),
-        el('div', { class: 'sets' }, ...setPills)
-      ));
-    }
-    if (s.notes) {
-      detail.appendChild(el('div', { class: 'session-notes' }, s.notes));
-    }
-    sessionEl.appendChild(detail);
-
-    list.appendChild(sessionEl);
+    detail.appendChild(el('div', { class: 'detail-lift' },
+      el('div', { class: 'name' }, b.lift?.name || 'Unknown'),
+      el('div', { class: 'sets' }, ...setPills)
+    ));
   }
-  root.appendChild(list);
+  if (s.notes) {
+    detail.appendChild(el('div', { class: 'session-notes' }, s.notes));
+  }
+  sessionEl.appendChild(detail);
+
+  return sessionEl;
 }
 
 function shortLiftName(name) {
@@ -917,6 +943,12 @@ function renderCharts(idx, lifts) {
   root.classList.remove('loading');
   root.innerHTML = '';
 
+  // All charts share the same 30-day window so x-axes line up.
+  const WINDOW_DAYS = 30;
+  const oneDay = 86400000;
+  const windowEnd = today();
+  const windowStart = new Date(windowEnd.getTime() - (WINDOW_DAYS - 1) * oneDay);
+
   const grid = el('div', { class: 'charts' });
   let rendered = 0;
 
@@ -939,7 +971,10 @@ function renderCharts(idx, lifts) {
 
     const points = [...byDate.entries()]
       .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([date, w]) => ({ x: parseDate(date), y: w }));
+      .map(([date, w]) => ({ x: parseDate(date), y: w }))
+      .filter((p) => p.x >= windowStart && p.x <= windowEnd);
+
+    if (points.length === 0) continue;
 
     const card = el('div', { class: 'chart-card' });
     card.appendChild(el('div', { class: 'head' },
@@ -949,6 +984,13 @@ function renderCharts(idx, lifts) {
     const canvas = el('canvas');
     card.appendChild(canvas);
     grid.appendChild(card);
+
+    // Y bounds: pad around the data so the line doesn't kiss the card edges.
+    const ys = points.map((p) => p.y);
+    const yMin = Math.min(...ys);
+    const yMax = Math.max(...ys);
+    const ySpan = yMax - yMin;
+    const yPad = ySpan === 0 ? Math.max(yMin * 0.05, 5) : ySpan * 0.25;
 
     // Render after attached so size is correct.
     queueMicrotask(() => {
@@ -960,13 +1002,13 @@ function renderCharts(idx, lifts) {
             borderColor: '#d97757',
             backgroundColor: 'rgba(217, 119, 87, 0.12)',
             borderWidth: 2,
-            pointRadius: 3,
-            pointHoverRadius: 5,
+            pointRadius: points.length === 1 ? 5 : 3,
+            pointHoverRadius: points.length === 1 ? 7 : 5,
             pointBackgroundColor: '#d97757',
             pointBorderColor: '#0a0a0a',
             pointBorderWidth: 1,
             tension: 0.2,
-            fill: true,
+            fill: points.length > 1,
           }],
         },
         options: {
@@ -992,12 +1034,15 @@ function renderCharts(idx, lifts) {
           scales: {
             x: {
               type: 'time',
-              time: { unit: points.length > 30 ? 'month' : 'week', displayFormats: { week: 'MMM d', month: 'MMM' } },
-              grid: { color: '#1c1c1c' },
+              min: windowStart,
+              max: windowEnd,
+              grid: { display: false },
               border: { color: '#232323' },
-              ticks: { color: '#71717a', font: { size: 10 }, maxRotation: 0, autoSkipPadding: 14 },
+              ticks: { display: false },
             },
             y: {
+              min: yMin - yPad,
+              max: yMax + yPad,
               grid: { color: '#1c1c1c' },
               border: { color: '#232323' },
               ticks: { color: '#71717a', font: { size: 10 }, callback: (v) => `${v}` },
@@ -1016,86 +1061,6 @@ function renderCharts(idx, lifts) {
   }
 }
 
-function renderStats(idx) {
-  const root = $('stats');
-  root.classList.remove('loading');
-  root.innerHTML = '';
-
-  const sessions = [...idx.sessionById.values()];
-  const totalSessions = sessions.length;
-
-  let totalVolume = 0;
-  for (const [, sets] of idx.setsBySession) {
-    for (const s of sets) {
-      if (s.is_warmup) continue;
-      const reps = s.actual_reps != null ? s.actual_reps : 0;
-      totalVolume += (s.weight || 0) * reps;
-    }
-  }
-
-  let daysSince = null;
-  if (sessions.length > 0) {
-    const newest = sessions.reduce((a, b) => (a.date > b.date ? a : b));
-    daysSince = daysBetween(parseDate(newest.date), today());
-  }
-
-  const streak = computeStreak(sessions);
-
-  const grid = el('div', { class: 'stats' });
-  grid.appendChild(stat(fmtInt(totalSessions), 'Sessions'));
-  grid.appendChild(stat(fmtInt(totalVolume), 'Volume (lb)'));
-  grid.appendChild(stat(daysSince == null ? '—' : String(daysSince), daysSince === 1 ? 'Day since last' : 'Days since last'));
-  grid.appendChild(stat(String(streak), streak === 1 ? 'Week streak' : 'Week streak'));
-  root.appendChild(grid);
-}
-
-function stat(value, label) {
-  return el('div', { class: 'stat' },
-    el('div', { class: 'v' }, value),
-    el('div', { class: 'k' }, label));
-}
-
-// Streak: consecutive ISO weeks (Mon-anchored) with ≥3 sessions, ending at most-recent week.
-function computeStreak(sessions) {
-  if (sessions.length === 0) return 0;
-  const counts = new Map();
-  for (const s of sessions) {
-    const key = isoWeekKey(parseDate(s.date));
-    counts.set(key, (counts.get(key) || 0) + 1);
-  }
-  // Walk backwards from current week.
-  const now = today();
-  let streak = 0;
-  // If current week doesn't have ≥3, try last week as the streak anchor (you might not have lifted yet today).
-  let cursor = new Date(now);
-  let allowedMissCurrent = true;
-  while (true) {
-    const key = isoWeekKey(cursor);
-    const c = counts.get(key) || 0;
-    if (c >= 3) {
-      streak++;
-    } else if (allowedMissCurrent && streak === 0) {
-      // current (incomplete) week — skip without breaking
-      allowedMissCurrent = false;
-    } else {
-      break;
-    }
-    cursor.setDate(cursor.getDate() - 7);
-    // Stop if we go before the earliest session
-    if (counts.size === 0) break;
-  }
-  return streak;
-}
-
-function isoWeekKey(d) {
-  // Mon=1..Sun=7. Get Monday of this week.
-  const day = d.getDay() || 7;
-  const monday = new Date(d);
-  monday.setDate(d.getDate() - day + 1);
-  monday.setHours(0, 0, 0, 0);
-  return `${monday.getFullYear()}-${monday.getMonth()}-${monday.getDate()}`;
-}
-
 // ----- Boot -----
 async function boot() {
   try {
@@ -1107,14 +1072,12 @@ async function boot() {
     const headerMeta = newest ? `${data.sessions.length} sessions · last ${fmtDateShort(newest.date)}` : 'no data';
     $('header-meta').textContent = headerMeta;
 
-    renderNext(idx, data.lifts);
-    renderRecent(idx);
+    renderSessions(idx);
     renderCharts(idx, data.lifts);
-    renderStats(idx);
   } catch (err) {
     console.error(err);
     const msg = err && err.message ? err.message : String(err);
-    for (const id of ['next', 'recent', 'charts', 'stats']) {
+    for (const id of ['sessions', 'charts']) {
       const e = $(id);
       e.classList.remove('loading');
       e.innerHTML = '';
