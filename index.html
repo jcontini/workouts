@@ -31,6 +31,10 @@
 
   * { box-sizing: border-box; }
 
+  html {
+    scrollbar-gutter: stable;
+  }
+
   html, body {
     margin: 0;
     padding: 0;
@@ -51,12 +55,15 @@
   }
 
   header {
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  header .brand-row {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    margin-bottom: 32px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
   }
 
   header h1 {
@@ -71,6 +78,43 @@
     color: var(--text-faint);
     font-variant-numeric: tabular-nums;
   }
+
+  /* Tab bar — horizontally scrollable on narrow screens */
+  .tabs {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    flex: 0 0 auto;
+    appearance: none;
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 14px;
+    margin-bottom: -1px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tab-btn:hover { color: var(--text-dim); }
+  .tab-btn.active {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+  }
+  .tab-btn:first-child { padding-left: 0; }
+
+  /* Tab panels */
+  .tab[hidden] { display: none; }
 
   section {
     margin-bottom: 44px;
@@ -366,6 +410,349 @@
     height: 130px !important;
   }
 
+  /* ---- Plan tab ---- */
+  .plan-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+    overflow: hidden;
+  }
+  .plan-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 16px 16px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .plan-name {
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .plan-schedule {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .plan-desc {
+    padding: 12px 16px;
+    color: var(--text-dim);
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+  }
+  .plan-workout {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .plan-workout-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .plan-workout-head .label {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    background: var(--bg-elev-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+  }
+  .plan-workout-head .plan-workout-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .plan-lift-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .plan-lift-list li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+  }
+  .plan-lift-list .lift-name { color: var(--text); }
+  .plan-lift-list .lift-prescription {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .plan-rules {
+    padding: 14px 16px;
+    background: var(--bg-elev-2);
+  }
+  .plan-rules-head {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 8px;
+  }
+  .plan-rule-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  /* ---- Exercises tab ---- */
+  .exercise-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .exercise-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+    padding: 14px 16px;
+  }
+  .exercise-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .exercise-name {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .exercise-current {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+  .exercise-current.dim { color: var(--text-faint); }
+  .exercise-meta {
+    font-size: 12px;
+    color: var(--text-faint);
+    text-transform: capitalize;
+    margin-bottom: 8px;
+  }
+  .muscle-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 8px;
+  }
+  .muscle-chips .chip {
+    background: var(--bg-elev-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .exercise-notes {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+  .exercise-chart {
+    width: 100% !important;
+    height: 90px !important;
+    display: block;
+    margin: 8px 0;
+  }
+  .exercise-link {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s;
+  }
+  .exercise-link:hover { border-bottom-color: var(--accent); }
+  .exercise-link::after {
+    content: ' ↗';
+    color: var(--text-faint);
+  }
+
+  /* ---- Body & Mind tab ---- */
+  .bodymind-layout {
+    position: relative;
+  }
+  .bodymind-main { min-width: 0; }
+
+  /* Chip row TOC — used on mobile, hidden on wide */
+  .bodymind-toc-chips {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .bodymind-toc-chips::-webkit-scrollbar { display: none; }
+  .bm-chip {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: var(--text-faint);
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .bm-chip:hover { color: var(--text-dim); border-color: var(--border-strong); }
+  .bm-chip.active {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  /* Sidebar TOC — only on wide viewports. position:fixed so it doesn't shift the
+     main column. Hidden below 1140px (where there's no room beside the 720px
+     centered column). */
+  .bodymind-toc-sidebar { display: none; }
+
+  @media (min-width: 1140px) {
+    .bodymind-toc-chips { display: none; }
+    .bodymind-toc-sidebar {
+      display: block;
+      position: fixed;
+      top: 110px;
+      /* Match where the 720-wide main column ends, plus a 32px gap. */
+      left: calc(50% + 360px + 32px);
+      width: 220px;
+      max-height: calc(100vh - 140px);
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .bodymind-toc-head {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 10px;
+    }
+    .bodymind-toc-sidebar ol {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-left: 1px solid var(--border);
+    }
+    .bodymind-toc-sidebar li { padding: 0; }
+    .bodymind-toc-sidebar a {
+      display: block;
+      padding: 4px 12px;
+      margin-left: -1px;
+      font-size: 13px;
+      color: var(--text-faint);
+      text-decoration: none;
+      border-left: 1px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .bodymind-toc-sidebar a:hover { color: var(--text-dim); }
+    .bodymind-toc-sidebar a.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+    }
+  }
+
+  /* Prose container — readable long-form typography */
+  .prose {
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.65;
+  }
+  .prose > *:first-child { margin-top: 0; }
+  .prose h1 {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 24px;
+  }
+  .prose h2 {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    margin: 40px 0 12px;
+    padding-top: 4px;
+    /* Reset h2 styling we set globally for section headings — body & mind
+       wants real headings, not all-caps eyebrows. */
+    text-transform: none;
+    color: var(--text);
+    scroll-margin-top: 80px;
+  }
+  .prose h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 24px 0 8px;
+    color: var(--text);
+    scroll-margin-top: 80px;
+  }
+  .prose p {
+    margin: 12px 0;
+    color: var(--text-dim);
+  }
+  .prose strong { color: var(--text); font-weight: 600; }
+  .prose em { color: var(--text); font-style: italic; }
+  .prose ul, .prose ol {
+    margin: 12px 0;
+    padding-left: 22px;
+    color: var(--text-dim);
+  }
+  .prose li {
+    margin: 4px 0;
+  }
+  .prose li::marker { color: var(--text-faint); }
+  .prose code {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--text);
+  }
+  .prose blockquote {
+    margin: 16px 0;
+    padding: 8px 14px;
+    border-left: 2px solid var(--accent);
+    background: var(--bg-elev);
+    color: var(--text-dim);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+  .prose hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+  .prose a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s;
+  }
+  .prose a:hover { border-bottom-color: var(--accent); }
+
   footer {
     margin-top: 48px;
     padding-top: 16px;
@@ -380,19 +767,58 @@
 <body>
 
 <header>
-  <h1>Lifts</h1>
-  <div class="meta" id="header-meta">—</div>
+  <div class="brand-row">
+    <h1>Lifts</h1>
+    <div class="meta" id="header-meta">—</div>
+  </div>
+  <nav class="tabs" id="tabs" aria-label="Sections">
+    <button type="button" data-tab="today"     class="tab-btn active" aria-selected="true">Today</button>
+    <button type="button" data-tab="plan"      class="tab-btn"        aria-selected="false">Plan</button>
+    <button type="button" data-tab="exercises" class="tab-btn"        aria-selected="false">Exercises</button>
+    <button type="button" data-tab="bodymind"  class="tab-btn"        aria-selected="false">Body &amp; Mind</button>
+  </nav>
 </header>
 
-<section id="sessions-section">
-  <h2>Sessions</h2>
-  <div id="sessions" class="loading"><div class="spinner"></div> Loading…</div>
-</section>
+<main>
+  <div class="tab" data-tab="today">
+    <section id="sessions-section">
+      <h2>Sessions</h2>
+      <div id="sessions" class="loading"><div class="spinner"></div> Loading…</div>
+    </section>
 
-<section id="charts-section">
-  <h2>Progression <span class="h2-sub">— last 30 days</span></h2>
-  <div id="charts" class="loading"><div class="spinner"></div> Loading…</div>
-</section>
+    <section id="charts-section">
+      <h2>Progression <span class="h2-sub">— last 30 days</span></h2>
+      <div id="charts" class="loading"><div class="spinner"></div> Loading…</div>
+    </section>
+  </div>
+
+  <div class="tab" data-tab="plan" hidden>
+    <section>
+      <h2>Active Plan</h2>
+      <div id="plan" class="loading"><div class="spinner"></div> Loading…</div>
+    </section>
+  </div>
+
+  <div class="tab" data-tab="exercises" hidden>
+    <section>
+      <h2>Exercises</h2>
+      <div id="exercises" class="loading"><div class="spinner"></div> Loading…</div>
+    </section>
+  </div>
+
+  <div class="tab" data-tab="bodymind" hidden>
+    <div class="bodymind-layout">
+      <aside class="bodymind-toc-sidebar" aria-label="Sections">
+        <div class="bodymind-toc-head">On this page</div>
+        <ol id="bodymind-toc-list"></ol>
+      </aside>
+      <section class="bodymind-main">
+        <nav class="bodymind-toc-chips" id="bodymind-toc-chips" aria-label="Sections"></nav>
+        <article id="bodymind" class="prose loading"><div class="spinner"></div> Loading…</article>
+      </section>
+    </div>
+  </div>
+</main>
 
 <footer>read-only · writes via Claude</footer>
 
@@ -401,6 +827,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 import Chart from 'https://esm.sh/chart.js@4.4.6/auto';
 // Chart.js v4 ships without a date adapter; this registers date-fns for the time scale.
 import 'https://esm.sh/chartjs-adapter-date-fns@3.0.0?deps=chart.js@4.4.6';
+import { marked } from 'https://esm.sh/marked@14.1.3';
 
 // ----- Config -----
 const CONFIG = {
@@ -938,42 +1365,116 @@ function shortLiftName(name) {
   return map[name.toLowerCase()] || name;
 }
 
+// Shared 30-day rolling window — both Today's progression grid and the
+// per-exercise sparklines use it so axes line up across the app.
+const PROGRESSION_WINDOW_DAYS = 30;
+
+function progressionWindow() {
+  const oneDay = 86400000;
+  const end = today();
+  const start = new Date(end.getTime() - (PROGRESSION_WINDOW_DAYS - 1) * oneDay);
+  return { start, end };
+}
+
+// Take the top working-set weight per session day, in ascending date order,
+// and clip to the given window.
+function progressionPoints(lift, idx, windowStart, windowEnd) {
+  const working = idx.workingByLift.get(lift.id) || [];
+  if (working.length === 0) return [];
+  const byDate = new Map();
+  for (const s of working) {
+    const sess = idx.sessionById.get(s.session_id);
+    if (!sess) continue;
+    const w = Number(s.weight) || 0;
+    const cur = byDate.get(sess.date) || 0;
+    if (w > cur) byDate.set(sess.date, w);
+  }
+  return [...byDate.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([date, w]) => ({ x: parseDate(date), y: w }))
+    .filter((p) => p.x >= windowStart && p.x <= windowEnd);
+}
+
+// Render a Chart.js line chart into the given canvas. Same look across the
+// app so the Today grid, the per-exercise card, etc. read as one component.
+function renderProgressionChart(canvas, points, windowStart, windowEnd) {
+  const ys = points.map((p) => p.y);
+  const yMin = Math.min(...ys);
+  const yMax = Math.max(...ys);
+  const ySpan = yMax - yMin;
+  const yPad = ySpan === 0 ? Math.max(yMin * 0.05, 5) : ySpan * 0.25;
+
+  return new Chart(canvas, {
+    type: 'line',
+    data: {
+      datasets: [{
+        data: points,
+        borderColor: '#d97757',
+        backgroundColor: 'rgba(217, 119, 87, 0.12)',
+        borderWidth: 2,
+        pointRadius: points.length === 1 ? 5 : 3,
+        pointHoverRadius: points.length === 1 ? 7 : 5,
+        pointBackgroundColor: '#d97757',
+        pointBorderColor: '#0a0a0a',
+        pointBorderWidth: 1,
+        tension: 0.2,
+        fill: points.length > 1,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 250 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#161616',
+          titleColor: '#f4f4f5',
+          bodyColor: '#a1a1aa',
+          borderColor: '#232323',
+          borderWidth: 1,
+          padding: 8,
+          displayColors: false,
+          callbacks: {
+            title: (items) => items[0].parsed.x ? new Date(items[0].parsed.x).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+            label: (item) => `${fmtWeight(item.parsed.y)} lb`,
+          },
+        },
+      },
+      scales: {
+        x: {
+          type: 'time',
+          min: windowStart,
+          max: windowEnd,
+          grid: { display: false },
+          border: { color: '#232323' },
+          ticks: { display: false },
+        },
+        y: {
+          min: yMin - yPad,
+          max: yMax + yPad,
+          grid: { color: '#1c1c1c' },
+          border: { color: '#232323' },
+          ticks: { color: '#71717a', font: { size: 10 }, callback: (v) => `${v}` },
+        },
+      },
+    },
+  });
+}
+
 function renderCharts(idx, lifts) {
   const root = $('charts');
   root.classList.remove('loading');
   root.innerHTML = '';
 
-  // All charts share the same 30-day window so x-axes line up.
-  const WINDOW_DAYS = 30;
-  const oneDay = 86400000;
-  const windowEnd = today();
-  const windowStart = new Date(windowEnd.getTime() - (WINDOW_DAYS - 1) * oneDay);
-
+  const { start: windowStart, end: windowEnd } = progressionWindow();
   const grid = el('div', { class: 'charts' });
   let rendered = 0;
 
   for (const displayName of MAIN_LIFTS) {
     const lift = findLiftByDisplayName(displayName, lifts);
     if (!lift) continue;
-
-    // Per session: take top working set weight that day for this lift.
-    const working = idx.workingByLift.get(lift.id) || [];
-    if (working.length === 0) continue;
-
-    const byDate = new Map();
-    for (const s of working) {
-      const sess = idx.sessionById.get(s.session_id);
-      if (!sess) continue;
-      const cur = byDate.get(sess.date) || 0;
-      if (s.weight > cur) byDate.set(sess.date, s.weight);
-    }
-    if (byDate.size === 0) continue;
-
-    const points = [...byDate.entries()]
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([date, w]) => ({ x: parseDate(date), y: w }))
-      .filter((p) => p.x >= windowStart && p.x <= windowEnd);
-
+    const points = progressionPoints(lift, idx, windowStart, windowEnd);
     if (points.length === 0) continue;
 
     const card = el('div', { class: 'chart-card' });
@@ -985,72 +1486,7 @@ function renderCharts(idx, lifts) {
     card.appendChild(canvas);
     grid.appendChild(card);
 
-    // Y bounds: pad around the data so the line doesn't kiss the card edges.
-    const ys = points.map((p) => p.y);
-    const yMin = Math.min(...ys);
-    const yMax = Math.max(...ys);
-    const ySpan = yMax - yMin;
-    const yPad = ySpan === 0 ? Math.max(yMin * 0.05, 5) : ySpan * 0.25;
-
-    // Render after attached so size is correct.
-    queueMicrotask(() => {
-      new Chart(canvas, {
-        type: 'line',
-        data: {
-          datasets: [{
-            data: points,
-            borderColor: '#d97757',
-            backgroundColor: 'rgba(217, 119, 87, 0.12)',
-            borderWidth: 2,
-            pointRadius: points.length === 1 ? 5 : 3,
-            pointHoverRadius: points.length === 1 ? 7 : 5,
-            pointBackgroundColor: '#d97757',
-            pointBorderColor: '#0a0a0a',
-            pointBorderWidth: 1,
-            tension: 0.2,
-            fill: points.length > 1,
-          }],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: { duration: 250 },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: '#161616',
-              titleColor: '#f4f4f5',
-              bodyColor: '#a1a1aa',
-              borderColor: '#232323',
-              borderWidth: 1,
-              padding: 8,
-              displayColors: false,
-              callbacks: {
-                title: (items) => items[0].parsed.x ? new Date(items[0].parsed.x).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
-                label: (item) => `${fmtWeight(item.parsed.y)} lb`,
-              },
-            },
-          },
-          scales: {
-            x: {
-              type: 'time',
-              min: windowStart,
-              max: windowEnd,
-              grid: { display: false },
-              border: { color: '#232323' },
-              ticks: { display: false },
-            },
-            y: {
-              min: yMin - yPad,
-              max: yMax + yPad,
-              grid: { color: '#1c1c1c' },
-              border: { color: '#232323' },
-              ticks: { color: '#71717a', font: { size: 10 }, callback: (v) => `${v}` },
-            },
-          },
-        },
-      });
-    });
+    queueMicrotask(() => renderProgressionChart(canvas, points, windowStart, windowEnd));
     rendered++;
   }
 
@@ -1061,8 +1497,306 @@ function renderCharts(idx, lifts) {
   }
 }
 
+// ----- Plan tab -----
+
+const ISO_DAY_NAMES = { 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat', 7: 'Sun' };
+
+function renderPlan(idx) {
+  const root = $('plan');
+  root.classList.remove('loading');
+  root.innerHTML = '';
+
+  const programs = [...idx.programById.values()];
+  if (programs.length === 0) {
+    root.appendChild(el('div', { class: 'empty' }, 'No program defined yet.'));
+    return;
+  }
+
+  // Currently we have one program. If we ever have more, render each.
+  for (const program of programs) {
+    root.appendChild(buildPlanCard(program, idx));
+  }
+}
+
+function buildPlanCard(program, idx) {
+  const card = el('div', { class: 'plan-card' });
+
+  card.appendChild(el('div', { class: 'plan-head' },
+    el('div', { class: 'plan-name' }, program.name),
+    el('div', { class: 'plan-schedule' },
+      (program.schedule_days || []).map((d) => ISO_DAY_NAMES[d] || d).join(' · ')
+    )
+  ));
+
+  if (program.description) {
+    card.appendChild(el('div', { class: 'plan-desc' }, program.description));
+  }
+
+  // Workouts (A / B / ...)
+  const byLabel = idx.programWorkoutsByProgramLabel.get(program.id);
+  const labels = byLabel ? [...byLabel.keys()].sort() : [];
+
+  for (const label of labels) {
+    const slots = byLabel.get(label);
+    const block = el('div', { class: 'plan-workout' });
+    block.appendChild(el('div', { class: 'plan-workout-head' },
+      el('span', { class: 'label' }, label),
+      el('span', { class: 'plan-workout-name' }, `Workout ${label}`)
+    ));
+    const ul = el('ul', { class: 'plan-lift-list' });
+    for (const slot of slots) {
+      const lift = idx.liftById.get(slot.lift_id);
+      ul.appendChild(el('li', null,
+        el('span', { class: 'lift-name' }, lift?.name || `Lift #${slot.lift_id}`),
+        el('span', { class: 'lift-prescription' }, `${slot.set_count} × ${slot.target_reps}`)
+      ));
+    }
+    block.appendChild(ul);
+    card.appendChild(block);
+  }
+
+  // Progression rules
+  const rules = el('div', { class: 'plan-rules' });
+  rules.appendChild(el('div', { class: 'plan-rules-head' }, 'Progression'));
+  const compoundInc = Number(program.progression_compound) || 5;
+  const ohpInc = Number(program.progression_ohp) || 2.5;
+  const deloadPct = Math.round((Number(program.deload_percent) || 0.1) * 100);
+  const deloadThresh = program.deload_threshold ?? 3;
+  rules.appendChild(el('ul', { class: 'plan-rule-list' },
+    el('li', null, `Compound lifts: +${fmtWeight(compoundInc)} lb after a successful session`),
+    el('li', null, `Overhead Press: +${fmtWeight(ohpInc)} lb after a successful session`),
+    el('li', null, `Failed reps: repeat the same weight next session`),
+    el('li', null, `${deloadThresh} consecutive failures: deload by ${deloadPct}%`),
+  ));
+  card.appendChild(rules);
+
+  return card;
+}
+
+// ----- Exercises tab -----
+
+function renderExercises(idx) {
+  const root = $('exercises');
+  root.classList.remove('loading');
+  root.innerHTML = '';
+
+  const lifts = [...idx.liftById.values()];
+  if (lifts.length === 0) {
+    root.appendChild(el('div', { class: 'empty' }, 'No exercises in the catalog yet.'));
+    return;
+  }
+
+  // Order: compounds first, others after, alphabetical within each group.
+  const order = MAIN_LIFTS.flatMap((n) => MAIN_LIFT_ALIASES[n] || [n]).map((s) => s.toLowerCase());
+  const ranked = [...lifts].sort((a, b) => {
+    const ai = order.indexOf(a.name.toLowerCase());
+    const bi = order.indexOf(b.name.toLowerCase());
+    const aOrd = ai === -1 ? 999 : ai;
+    const bOrd = bi === -1 ? 999 : bi;
+    if (aOrd !== bOrd) return aOrd - bOrd;
+    return a.name.localeCompare(b.name);
+  });
+
+  const list = el('div', { class: 'exercise-list' });
+  for (const lift of ranked) list.appendChild(buildExerciseCard(lift, idx));
+  root.appendChild(list);
+}
+
+function buildExerciseCard(lift, idx) {
+  const card = el('div', { class: 'exercise-card' });
+
+  // Top row: name + (optional) latest weight
+  const working = idx.workingByLift.get(lift.id) || [];
+  const latestWeight = working.length ? Number(working[working.length - 1].weight) : null;
+
+  card.appendChild(el('div', { class: 'exercise-head' },
+    el('div', { class: 'exercise-name' }, lift.name),
+    latestWeight != null
+      ? el('div', { class: 'exercise-current' }, `${fmtWeight(latestWeight)} lb`)
+      : el('div', { class: 'exercise-current dim' }, '—')
+  ));
+
+  // Meta line
+  const metaBits = [];
+  if (lift.category) metaBits.push(lift.category);
+  if (lift.equipment) metaBits.push(lift.equipment);
+  if (metaBits.length) {
+    card.appendChild(el('div', { class: 'exercise-meta' }, metaBits.join(' · ')));
+  }
+
+  // Muscles
+  const muscles = Array.isArray(lift.primary_muscles) ? lift.primary_muscles : [];
+  if (muscles.length) {
+    const chips = el('div', { class: 'muscle-chips' });
+    for (const m of muscles) chips.appendChild(el('span', { class: 'chip' }, m));
+    card.appendChild(chips);
+  }
+
+  if (lift.notes) {
+    card.appendChild(el('div', { class: 'exercise-notes' }, lift.notes));
+  }
+
+  // Progression chart — same component as the Today tab's grid.
+  const { start: windowStart, end: windowEnd } = progressionWindow();
+  const points = progressionPoints(lift, idx, windowStart, windowEnd);
+  if (points.length > 0) {
+    const canvas = el('canvas', { class: 'exercise-chart' });
+    card.appendChild(canvas);
+    queueMicrotask(() => renderProgressionChart(canvas, points, windowStart, windowEnd));
+  }
+
+  // How-to link
+  if (lift.video_url) {
+    card.appendChild(el('a', {
+      class: 'exercise-link',
+      href: lift.video_url,
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    }, 'How to · Alan Thrall'));
+  }
+
+  return card;
+}
+
+// ----- Body & Mind tab -----
+
+const BODYMIND_PATH = 'content/bodymind.md';
+
+// Slugify a heading into a stable anchor id, prefixed so it can't collide
+// with the tab router's hashes (#today, #plan, ...).
+function bmSlug(text) {
+  return 'bm-' + text
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+async function renderBodyMind() {
+  const root = $('bodymind');
+  try {
+    const res = await fetch(BODYMIND_PATH, { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`Failed to load ${BODYMIND_PATH}: ${res.status}`);
+    const md = await res.text();
+
+    const html = marked.parse(md);
+    root.classList.remove('loading');
+    root.innerHTML = html;
+
+    // Add anchor ids to every h2 / h3 so the TOC and deep-links work.
+    const sections = [];
+    for (const h of root.querySelectorAll('h2, h3')) {
+      const id = bmSlug(h.textContent);
+      h.id = id;
+      if (h.tagName === 'H2') sections.push({ id, text: h.textContent });
+    }
+
+    buildBodyMindToc(sections);
+    wireBodyMindAnchors();
+    setupBodyMindScrollSpy(sections);
+  } catch (err) {
+    console.error(err);
+    root.classList.remove('loading');
+    root.innerHTML = '';
+    root.appendChild(el('div', { class: 'error' }, err.message || String(err)));
+  }
+}
+
+function buildBodyMindToc(sections) {
+  const list = $('bodymind-toc-list');
+  const chips = $('bodymind-toc-chips');
+  if (list) {
+    list.innerHTML = '';
+    for (const s of sections) {
+      const a = el('a', { href: `#${s.id}`, 'data-anchor': s.id }, s.text);
+      list.appendChild(el('li', null, a));
+    }
+  }
+  if (chips) {
+    chips.innerHTML = '';
+    for (const s of sections) {
+      chips.appendChild(el('a', {
+        class: 'bm-chip',
+        href: `#${s.id}`,
+        'data-anchor': s.id,
+      }, s.text));
+    }
+  }
+}
+
+// Override default anchor behavior: smooth scroll, but DON'T let the click
+// rewrite the URL hash to something the tab router will then misinterpret.
+// We keep the tab hash (#bodymind) and use a query-style fragment for scroll
+// positions only when the user explicitly chooses one.
+function wireBodyMindAnchors() {
+  for (const a of document.querySelectorAll('[data-anchor]')) {
+    a.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      const id = a.dataset.anchor;
+      const target = document.getElementById(id);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+}
+
+// Scroll-spy: highlight the chip / sidebar entry whose section is currently
+// nearest the top of the viewport.
+function setupBodyMindScrollSpy(sections) {
+  if (sections.length === 0) return;
+  const ids = sections.map((s) => s.id);
+
+  const update = () => {
+    const panel = document.querySelector('.tab[data-tab="bodymind"]');
+    if (!panel || panel.hidden) return;
+    const probe = 120; // px from top — anchor's "active" zone
+    let activeId = ids[0];
+    for (const id of ids) {
+      const e = document.getElementById(id);
+      if (!e) continue;
+      const top = e.getBoundingClientRect().top;
+      if (top - probe <= 0) activeId = id;
+      else break;
+    }
+    for (const node of document.querySelectorAll('[data-anchor]')) {
+      node.classList.toggle('active', node.dataset.anchor === activeId);
+    }
+  };
+
+  window.addEventListener('scroll', update, { passive: true });
+  // Run once after layout settles so the first chip is highlighted.
+  setTimeout(update, 0);
+}
+
+// ----- Tabs -----
+const TABS = ['today', 'plan', 'exercises', 'bodymind'];
+
+function activateTab(name) {
+  if (!TABS.includes(name)) name = 'today';
+  for (const btn of document.querySelectorAll('#tabs .tab-btn')) {
+    const active = btn.dataset.tab === name;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-selected', active ? 'true' : 'false');
+  }
+  for (const panel of document.querySelectorAll('main > .tab')) {
+    panel.hidden = panel.dataset.tab !== name;
+  }
+  // Reflect in hash for reloads / back button.
+  if (location.hash !== `#${name}`) history.replaceState(null, '', `#${name}`);
+}
+
+function wireTabs() {
+  for (const btn of document.querySelectorAll('#tabs .tab-btn')) {
+    btn.addEventListener('click', () => activateTab(btn.dataset.tab));
+  }
+  window.addEventListener('hashchange', () => {
+    activateTab((location.hash || '#today').slice(1));
+  });
+  activateTab((location.hash || '#today').slice(1));
+}
+
 // ----- Boot -----
 async function boot() {
+  wireTabs();
   try {
     const data = await fetchAll();
     const idx = indexData(data);
@@ -1074,11 +1808,15 @@ async function boot() {
 
     renderSessions(idx);
     renderCharts(idx, data.lifts);
+    renderPlan(idx);
+    renderExercises(idx);
+    renderBodyMind();
   } catch (err) {
     console.error(err);
     const msg = err && err.message ? err.message : String(err);
-    for (const id of ['sessions', 'charts']) {
+    for (const id of ['sessions', 'charts', 'plan', 'exercises', 'bodymind']) {
       const e = $(id);
+      if (!e) continue;
       e.classList.remove('loading');
       e.innerHTML = '';
       e.appendChild(el('div', { class: 'error' }, msg));
