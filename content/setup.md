@@ -1,4 +1,4 @@
-# Set up your own lifting tracker
+# Set up your own workouts tracker
 
 This is the source for [jcontini.github.io/workouts](https://jcontini.github.io/workouts/) — a private dashboard for a barbell-lifting program. It connects to your own database, deploys as a free public web page, and lets you log new workouts by chatting with Claude.
 
@@ -13,7 +13,7 @@ You don't need to know how to code or use a terminal. An AI walks you through ev
 4. **Copy the prompt below** (use the Copy button) and paste it into Claude Code. Press Enter.
 
 ```
-I want to set up my own lifting tracker like https://jcontini.github.io/workouts/.
+I want to set up my own workouts tracker like https://jcontini.github.io/workouts/.
 
 Please fetch the full instructions at https://jcontini.github.io/workouts/content/setup.md and walk me through it. The instructions are written for you — follow them top to bottom. Ask me questions as you need them. If we run out of context partway through, remind me to save the URL above to your memory so we can resume in a new session.
 
@@ -28,7 +28,7 @@ That's it. The rest of this page is technical instructions written *for the AI*.
 
 ## Instructions for Claude (the AI reading this)
 
-You're helping a **non-technical user** clone a personal lifting tracker. The end state is:
+You're helping a **non-technical user** clone a personal workouts tracker. The end state is:
 
 - Their own GitHub repo (scaffolded from this one) deployed to their own GitHub Pages URL.
 - Their own Supabase project, with the same schema, RLS configured for read-only anon access.
@@ -96,36 +96,45 @@ brew install gh
 3. Tell the user: "Your browser is going to open. Paste this code: `XXXX-XXXX`. Click 'Authorize'. Come back here when done."
 4. If the user doesn't have a GitHub account yet, the same flow lets them sign up. Walk them through it.
 
-### Phase 4 — Supabase account + access token
+### Phase 4 — Supabase account
 
-Supabase is the database service the dashboard talks to. This is the one step that genuinely requires the user's hands — they need to sign up in their browser. Open the browser for them with `open https://supabase.com` (macOS) / `xdg-open https://supabase.com` (Linux) / `start https://supabase.com` (Windows) so they don't have to copy-paste the URL.
+Supabase is the free database service the dashboard talks to. The user has to sign up in their browser — that part can't be automated.
 
-Walk them through it like this:
+Open the browser for them: `open https://supabase.com` on macOS, `xdg-open https://supabase.com` on Linux, `start https://supabase.com` on Windows. Then walk them through:
 
-1. **Sign up.** "Your browser is opening to supabase.com. Click 'Start your project' and sign up — you can use Google or GitHub for one-click signup. The free tier is what we want — no credit card needed." Wait for them to confirm they're logged in.
-2. **Get an access token** so you can manage their projects on their behalf. Open a second tab for them: `open https://supabase.com/dashboard/account/tokens`. Tell them: "On this page, click 'Generate new token'. Name it 'Claude Code'. Copy the token that appears — you'll only see it once. Paste it back into this chat."
-3. When they paste the token, **treat it as a secret**. Don't echo it back. Don't write it to disk anywhere except the MCP config you'll write next.
+> "Your browser is opening to supabase.com. Click 'Start your project' and sign up — you can use Google or GitHub for a one-click signup. The free tier is what we want; no credit card needed. Tell me when you're logged in and I'll connect your database for you."
 
-### Phase 5 — Install the Supabase MCP
+Wait for them to confirm they're logged in to the Supabase dashboard before continuing.
 
-The Supabase MCP is a small program that lets you (the AI) talk to the user's Supabase database directly. Install it for them:
+### Phase 5 — Connect Supabase to Claude (OAuth, no token paste)
 
-```
-claude mcp add supabase \
-  --env SUPABASE_ACCESS_TOKEN=<their-token> \
-  -- npx -y @supabase/mcp-server-supabase@latest
-```
+Supabase is now an official Claude connector. The user authorizes Supabase from inside Claude itself — no personal-access-token paste, no terminal commands. Connectors enabled at [claude.ai/customize/connectors](https://claude.ai/customize/connectors) are automatically picked up by Claude Code when it's signed in to the same Claude account.
 
-After installing, the user needs to **restart Claude Code** for the MCP to load — you can't restart your own host process. Tell them: "I just connected your database. Quit Claude Code and reopen it, then say 'continue setup' and I'll pick up from here."
+**Heads-up before starting:** the Supabase connector requires a **paid Claude plan** (Pro / Max / Team / Enterprise). If the user is on the free tier, you'll need to use the legacy MCP path instead — see "Fallback: legacy MCP" at the end of this phase.
 
-When they're back, confirm a Supabase tool is available (e.g. `mcp__supabase__list_organizations`). If not, troubleshoot before proceeding.
+Walk them through it:
+
+1. Open the Claude connectors page for them: `open https://claude.ai/customize/connectors` (or the appropriate command for their OS).
+2. Tell them: "On this page, find Supabase in the list of connectors and click 'Connect'. A Supabase authorization screen will appear. Pick the organization you just created and click 'Authorize'. Tell me when it shows as connected."
+3. Wait for confirmation. Then tell them: "I just need you to **quit Claude Code and reopen it** so it picks up the new connection. When you're back, say 'continue setup' and I'll keep going."
+4. When they're back, run `/mcp` mentally — confirm a Supabase tool is available (e.g. `mcp__supabase__list_organizations` or similarly-named). If not, troubleshoot before proceeding.
+
+**Fallback: legacy MCP (free Claude users only).** If the connector isn't an option:
+
+1. Open <https://supabase.com/dashboard/account/tokens> for them. Tell them: "Click 'Generate new token', name it 'Claude Code', copy the token, paste it here."
+2. Treat the token as a secret — never echo it back.
+3. Install the MCP server with the token:
+   ```
+   claude mcp add supabase --env SUPABASE_ACCESS_TOKEN=<their-token> -- npx -y @supabase/mcp-server-supabase@latest
+   ```
+4. Restart Claude Code as in step 3 above.
 
 ### Phase 6 — Create the Supabase project
 
 Using the MCP:
 
 1. List their organizations.
-2. Create a new project named e.g. `lifting`. Pick a region close to them. Use the free tier.
+2. Create a new project named e.g. `workouts`. Pick a region close to them. Use the free tier.
 3. Wait for it to finish provisioning (status `ACTIVE_HEALTHY`).
 4. Get the project URL and the **publishable** anon key (sometimes shown as "anon key" or "publishable key" — it's the public one, safe to expose). The MCP has `get_project_url` and `get_publishable_keys` for this.
 
@@ -290,7 +299,7 @@ git clone https://github.com/jcontini/workouts ~/workouts
 cd ~/workouts
 rm -rf .git
 git init -b main
-gh repo create workouts --public --source=. --description "My lifting tracker"
+gh repo create workouts --public --source=. --description "My workouts tracker"
 ```
 
 If `~/workouts` already exists, ask the user whether they want to overwrite it or pick a different name (e.g. `~/workouts-mine`).
@@ -313,7 +322,7 @@ Use `Read` + `Edit`. Don't have the user touch the file by hand.
 
 ```
 git add -A
-git commit -m "Initial: my lifting tracker"
+git commit -m "Initial: my workouts tracker"
 git push -u origin main
 gh api -X POST repos/<user>/workouts/pages -f 'source[branch]=main' -f 'source[path]=/'
 ```
