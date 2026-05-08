@@ -1,16 +1,6 @@
 # Set up your own workouts tracker
 
-This is the source for [jcontini.github.io/workouts](https://jcontini.github.io/workouts/) — a private dashboard for a barbell-lifting program. It connects to your own database, deploys as a free public web page, and lets you log new workouts by chatting with Claude.
-
-You don't need to know how to code or use a terminal. An AI walks you through everything.
-
-## How it works
-
-1. **Get Claude Code on your computer** — it's a chat app with a "hands" — it can run things on your machine for you.
-   - macOS / Windows / Linux: download from <https://claude.com/claude-code>
-2. Open it. You'll see a chat box.
-3. **Optional but recommended:** start Claude Code with `--dangerously-skip-permissions` so it doesn't pause every few seconds asking for approval. (You can also approve as you go — your choice.)
-4. **Copy the prompt below** (use the Copy button) and paste it into Claude Code. Press Enter.
+**Quick setup — paste this into [Claude Code](https://claude.com/claude-code):**
 
 ```
 I want to set up my own workouts tracker like https://jcontini.github.io/workouts/.
@@ -20,9 +10,18 @@ Please fetch the full instructions at https://jcontini.github.io/workouts/conten
 I am non-technical. Don't ask me to do anything in a terminal — you do it. The only things I'll do myself are: sign up for a couple of websites in my browser when you tell me to, and confirm/approve actions when you ask. That's it.
 ```
 
-5. Answer Claude's questions as it goes. Approve actions when it asks. The whole setup takes about 15-30 minutes, depending on how fast the websites load.
+That's it. Claude does the rest. Takes about 15–30 minutes.
 
-That's it. The rest of this page is technical instructions written *for the AI*. You don't need to read them.
+---
+
+## What this is
+
+A private dashboard for a barbell-lifting program. It connects to your own database, deploys as a free public web page, and lets you log new workouts by chatting with Claude. You don't need to know how to code or use a terminal — an AI walks you through everything.
+
+## What you'll need
+
+- **[Claude Code](https://claude.com/claude-code)** on your computer (free download, macOS / Windows / Linux). It's a chat app with hands — it can run things on your machine for you.
+- **Optional but recommended:** start it with `--dangerously-skip-permissions` so it doesn't pause every few seconds asking for approval. (You can also approve as you go.)
 
 ---
 
